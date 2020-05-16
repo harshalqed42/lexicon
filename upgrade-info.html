@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Drupal Module Upgrader analysis report</title>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:600italic,400,700,600' rel='stylesheet' type='text/css' />
+    <style type="text/css">
+    <!--
+
+body {
+  width: 80%;
+  color: #343434;
+  margin: 1em auto;
+  font-family: 'Open Sans', Verdana, sans-serif;
+}
+
+details {
+  font-size: 18px;
+  line-height: 25px;
+  margin-bottom: 2em;
+  display: list-item;
+  list-style: none;
+}
+
+details summary {
+  padding: 1em;
+  margin-bottom: 1em;
+  display: list-item;
+  cursor: pointer;
+}
+
+details.error summary {
+  background-color: #ffd5d5;
+}
+
+details.warning summary {
+  background-color: #fff3bb;
+}
+
+a {
+  color: #095cb1;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+h5 {
+  font-size: 1em;
+}
+
+aside {
+  font-style: italic;
+  line-height: 20px;
+  font-size: 15px;
+}
+
+.group {
+  border: 1px solid #ececec;
+  padding: 1em;
+  display: block;
+}
+
+.group > summary {
+  padding: 0;
+  color: #c8c8c8;
+  margin-bottom: 0;;
+  font-weight: bold;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  display: list-item;
+}
+
+.group[open] > summary {
+  margin-bottom: 1em;
+}
+
+.group > details:last-child {
+  margin-bottom: 0;
+}
+
+    -->
+    </style>
+  </head>
+  <body>
+    <h1>Drupal Module Upgrader analysis report</h1>
+      <details open="true" class="group">
+      <summary></summary>
+          <details class="error">
+      <summary><code>drupal_add_css()</code> has been removed.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/2169605"><code>drupal_add_css()</code>, <code>drupal_add_js()</code> and <code>drupal_add_library()</code> removed in favor of <code>#attached</code></a></li>
+                <li><a target="_blank" href="https://www.drupal.org/node/2408597"><code>AssetResolverInterface</code> and <code>AttachedAssetsInterface</code> replace internal Asset API functions</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.module, line 452</li>
+            </ul>
+                  <aside>Flagged by _function_call:drupal_add_css</aside>    </details>
+    <details class="error">
+      <summary><code>drupal_add_js()</code> has been removed.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/2169605"><code>drupal_add_css()</code>, <code>drupal_add_js()</code> and <code>drupal_add_library()</code> removed in favor of <code>#attached</code></a></li>
+                <li><a target="_blank" href="https://www.drupal.org/node/2408597"><code>AssetResolverInterface</code> and <code>AttachedAssetsInterface</code> replace internal Asset API functions</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 19</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 20</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 21</li>
+            </ul>
+                  <aside>Flagged by _function_call:drupal_add_js</aside>    </details>
+    <details class="error">
+      <summary>The caching system has been rewritten.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/1884796">Drupal 8 Cache API</a></li>
+                <li><a target="_blank" href="https://www.drupal.org/node/1272696">New cache API</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.install, line 93</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 1262</li>
+            </ul>
+                  <aside>Flagged by _function_call:cache_clear_all</aside>    </details>
+    <details class="error">
+      <summary><code>drupal_map_assoc()</code> has been removed.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/2207453"><code>drupal_map_assoc()</code> removed</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 220</li>
+            </ul>
+                  <aside>Flagged by _function_call:drupal_map_assoc</aside>    </details>
+    <details class="error">
+      <summary><code>drupal_set_title()</code> has been removed.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/2067859"><code>drupal_set_title()</code> removed</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 82</li>
+            </ul>
+                  <aside>Flagged by _function_call:drupal_set_title</aside>    </details>
+    <details class="error">
+      <summary><code>taxonomy_term_load()</code> has been removed.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/2266845">Entities are now classed objects implementing <code>EntityInterface</code></a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.module, line 264</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 1177</li>
+            </ul>
+                  <aside>Flagged by _function_call:taxonomy_term_load</aside>    </details>
+    <details class="error">
+      <summary><code>drupal_get_form()</code> has moved into the FormBuilder service.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/2121003">Form generation functions moved into FormBuilder service</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 14</li>
+            </ul>
+                  <aside>Flagged by _function_call:drupal_get_form</aside>    </details>
+    <details class="error">
+      <summary><code>l()</code> has been removed.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/2346779"><code>l()</code> replaced by URL generation API</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/templates/lexicon-overview.tpl.php, line 41</li>
+              <li>modules/contrib/lexicon/templates/lexicon-overview-item.tpl.php, line 36</li>
+              <li>modules/contrib/lexicon/templates/lexicon-overview-item.tpl.php, line 54</li>
+              <li>modules/contrib/lexicon/templates/lexicon-mark-term.tpl.php, line 35</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 167</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 265</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 268</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 271</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 274</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 24</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 25</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 282</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 283</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 514</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 657</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 714</li>
+              <li>modules/contrib/lexicon/templates/lexicon-block-term.tpl.php, line 39</li>
+              <li>modules/contrib/lexicon/templates/lexicon-block-term.tpl.php, line 46</li>
+              <li>modules/contrib/lexicon/templates/lexicon-block-term.tpl.php, line 61</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 154</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 155</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 234</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 245</li>
+            </ul>
+                  <aside>Flagged by _function_call:l</aside>    </details>
+    <details class="error">
+      <summary><code>get_t()</code> has been removed.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/2021435"><code>get_t()</code> replaced by <code>t()</code></a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.install, line 13</li>
+            </ul>
+                  <aside>Flagged by _function_call:get_t</aside>    </details>
+    <details class="error">
+      <summary><code>taxonomy_get_tree()</code> is now a method of the taxonomy term storage controller.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/2328205">Certain Taxonomy API functions have moved into <code>TermStorage</code> class</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.module, line 993</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 1141</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 89</li>
+            </ul>
+                  <aside>Flagged by _function_call:taxonomy_get_tree</aside>    </details>
+    <details class="error">
+      <summary><code>theme()</code> has been renamed to <code>_theme()</code>, and should never be called directly.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/2195739"><code>theme()</code> renamed to <code>_theme()</code> and should not be called directly</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.module, line 293</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 969</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 133</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 157</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 170</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 261</li>
+            </ul>
+                  <aside>Flagged by _function_call:theme</aside>    </details>
+    <details class="error">
+      <summary><code>drupal_strlen()</code> has been moved into the Unicode utility class.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/1992584"><code>drupal_strlen()</code> moved into Unicode component</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.module, line 804</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 818</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 822</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 853</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 853</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 877</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 881</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 912</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 912</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 951</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 956</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 958</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 967</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 38</li>
+            </ul>
+                  <aside>Flagged by _function_call:drupal_strlen</aside>    </details>
+    <details class="error">
+      <summary><code>drupal_strtolower()</code> has been moved into the Unicode utility class.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/1992584"><code>drupal_strtolower()</code> moved into Unicode component</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.module, line 623</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 797</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 813</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 872</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 1073</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 1092</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 124</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 175</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 230</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 276</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 297</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 297</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 301</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 301</li>
+            </ul>
+                  <aside>Flagged by _function_call:drupal_strtolower</aside>    </details>
+    <details class="error">
+      <summary><code>drupal_strtoupper()</code> has been moved into the Unicode utility class.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/1992584"><code>drupal_strtoupper()</code> moved into Unicode component</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/templates/lexicon-overview-section.tpl.php, line 20</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 84</li>
+            </ul>
+                  <aside>Flagged by _function_call:drupal_strtoupper</aside>    </details>
+    <details class="error">
+      <summary><code>drupal_substr()</code> has been moved into the Unicode utility class.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/1992584"><code>drupal_substr()</code> moved into Unicode component</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.module, line 564</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 623</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 791</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 819</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 827</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 827</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 832</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 832</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 837</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 842</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 878</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 886</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 886</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 891</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 891</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 896</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 901</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 945</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 957</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 962</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 978</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 1073</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 1092</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 38</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 42</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 124</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 230</li>
+            </ul>
+                  <aside>Flagged by _function_call:drupal_substr</aside>    </details>
+    <details class="error">
+      <summary><code>truncate_utf8()</code> has been moved into the Unicode utility class.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/1992584"><code>truncate_utf8()</code> moved into Unicode component</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.module, line 273</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 274</li>
+            </ul>
+                  <aside>Flagged by _function_call:truncate_utf8</aside>    </details>
+    <details class="error">
+      <summary><code>url()</code> has been removed.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/2346779"><code>url()</code> replaced by URL generation API</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.module, line 677</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 689</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 702</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 733</li>
+            </ul>
+                  <aside>Flagged by _function_call:url</aside>    </details>
+    <details class="error">
+      <summary><code>user_access()</code> is now <code>AccountInterface::hasPermission()</code>.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/2049309"><code>user_access()</code> got converted to a method on the user/account interface</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.module, line 1029</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 1030</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 270</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 282</li>
+            </ul>
+                  <aside>Flagged by _function_call:user_access</aside>    </details>
+    <details class="error">
+      <summary><code>variable_del()</code> has been removed.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/2183531">The Variable API has been removed</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.install, line 42</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 43</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 44</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 45</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 46</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 47</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 51</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 52</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 53</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 54</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 55</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 56</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 57</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 58</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 59</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 60</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 61</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 62</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 63</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 64</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 65</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 66</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 67</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 68</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 69</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 70</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 71</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 72</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 73</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 74</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 75</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 76</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 77</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 78</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 79</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 80</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 81</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 82</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 83</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 84</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 85</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 86</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 87</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 88</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 89</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 90</li>
+            </ul>
+                  <aside>Flagged by _function_call:variable_del</aside>    </details>
+    <details class="error">
+      <summary><code>variable_get()</code> has been removed.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/2183531">The Variable API has been removed</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 45</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 55</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 69</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 76</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 90</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 97</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 104</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 116</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 123</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 130</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 137</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 144</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 158</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 173</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 194</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 208</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 219</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 230</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 281</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 289</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 305</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 327</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 334</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 341</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 409</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 417</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 425</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 441</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 450</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 487</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 517</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 525</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 531</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 597</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 676</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 692</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 708</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 38</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 59</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 82</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 95</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 108</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 123</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 130</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 149</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 156</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 163</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 182</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 223</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 223</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 224</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 228</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 261</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 269</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 271</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 272</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 279</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 280</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 287</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 306</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 313</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 314</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 449</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 478</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 548</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 584</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 599</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 601</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 602</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 604</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 617</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 619</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 622</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 623</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 626</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 635</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 654</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 657</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 697</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 709</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 770</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 774</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 775</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 783</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 824</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 883</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 1022</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 1023</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 1024</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 1025</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 1026</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 1027</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 1028</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 1069</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 1086</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 1143</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 1171</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 1193</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 1257</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 13</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 24</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 30</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 63</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 67</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 68</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 69</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 70</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 83</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 106</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 120</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 179</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 181</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 210</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 211</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 213</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 219</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 219</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 227</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 257</li>
+              <li>modules/contrib/lexicon/lexicon.pages.inc, line 258</li>
+            </ul>
+                  <aside>Flagged by _function_call:variable_get</aside>    </details>
+    <details class="error">
+      <summary><code>variable_set()</code> has been removed.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/2183531">The Variable API has been removed</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 365</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 366</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 367</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 368</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 369</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 370</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 371</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 372</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 373</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 374</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 375</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 376</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 377</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 378</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 379</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 380</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 381</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 382</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 383</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 384</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 385</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 386</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 387</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 388</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 468</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 470</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 473</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 475</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 476</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 477</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 577</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 578</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 579</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 745</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 748</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 751</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 197</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 202</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 203</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 204</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 205</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 206</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 207</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 208</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 209</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 256</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 257</li>
+            </ul>
+                  <aside>Flagged by _function_call:variable_set</aside>    </details>
+    <details class="error">
+      <summary><code>drupal_set_message()</code> has been removed.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/2774931"><code>drupal_set_message()</code> moved into stream wrapper manager service.</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 13</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 39</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 394</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 479</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 563</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 588</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 684</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 700</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 716</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 730</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 756</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 95</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 1263</li>
+              <li>modules/contrib/lexicon/lexicon.module, line 1272</li>
+            </ul>
+                  <aside>Flagged by _function_call:drupal_set_message</aside>    </details>
+    <details class="error">
+      <summary><code>db_query()</code> has been removed.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/2993033"><code>db_query()</code> is deprecated.</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 32</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 501</li>
+              <li>modules/contrib/lexicon/lexicon.admin.inc, line 655</li>
+            </ul>
+                  <aside>Flagged by _function_call:db_query</aside>    </details>
+    <details class="error">
+      <summary><code>db_select()</code> has been removed.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/2993033"><code>db_select()</code> is deprecated.</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.module, line 239</li>
+            </ul>
+                  <aside>Flagged by _function_call:db_select</aside>    </details>
+    <details class="warning">
+      <summary>Default configuration is deleted automatically.</summary>
+
+      
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.install, line 42</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 43</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 44</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 45</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 46</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 47</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 51</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 52</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 53</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 54</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 55</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 56</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 57</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 58</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 59</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 60</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 61</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 62</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 63</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 64</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 65</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 66</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 67</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 68</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 69</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 70</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 71</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 72</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 73</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 74</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 75</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 76</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 77</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 78</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 79</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 80</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 81</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 82</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 83</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 84</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 85</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 86</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 87</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 88</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 89</li>
+              <li>modules/contrib/lexicon/lexicon.install, line 90</li>
+            </ul>
+                  <aside>Flagged by hook_uninstall</aside>    </details>
+    <details class="warning">
+      <summary>Many common functions, shared variables, and constants have been renamed.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/2324935">The global theme variables have been replaced by an ActiveTheme object</a></li>
+              </ul>
+      
+                      </details>
+    <details class="error">
+      <summary>Blocks are now plugins in the <code>MODULE\Plugin\Block</code> namespace.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/1880620">Blocks are now plugins</a></li>
+                <li><a target="_blank" href="https://api.drupal.org/api/drupal/core%21modules%21block%21block.api.php/group/block_api/8">Drupal 8 Block API</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.module, line 39</li>
+            </ul>
+                  <aside>Flagged by _flag_hook:block_info</aside>    </details>
+    <details class="error">
+      <summary>Blocks are now plugins in the <code>MODULE\Plugin\Block</code> namespace.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/1880620">Blocks are now plugins</a></li>
+                <li><a target="_blank" href="https://api.drupal.org/api/drupal/core%21modules%21block%21block.api.php/group/block_api/8">Drupal 8 Block API</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.module, line 50</li>
+            </ul>
+                  <aside>Flagged by _flag_hook:block_configure</aside>    </details>
+    <details class="error">
+      <summary>Blocks are now plugins in the <code>MODULE\Plugin\Block</code> namespace.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/1880620">Blocks are now plugins</a></li>
+                <li><a target="_blank" href="https://api.drupal.org/api/drupal/core%21modules%21block%21block.api.php/group/block_api/8">Drupal 8 Block API</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.module, line 191</li>
+            </ul>
+                  <aside>Flagged by _flag_hook:block_save</aside>    </details>
+    <details class="error">
+      <summary>Blocks are now plugins in the <code>MODULE\Plugin\Block</code> namespace.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/1880620">Blocks are now plugins</a></li>
+                <li><a target="_blank" href="https://api.drupal.org/api/drupal/core%21modules%21block%21block.api.php/group/block_api/8">Drupal 8 Block API</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.module, line 214</li>
+            </ul>
+                  <aside>Flagged by _flag_hook:block_view</aside>    </details>
+    <details class="error">
+      <summary><code>hook_init()</code> has been removed.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/2013014"><code>hook_init()</code> removed</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.module, line 444</li>
+            </ul>
+                  <aside>Flagged by _flag_hook:init</aside>    </details>
+    <details class="error">
+      <summary><code>hook_menu()</code> has been removed from Drupal 8.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/1800686">All functionality of <code>hook_menu()</code> replaced</a></li>
+                <li><a target="_blank" href="https://www.drupal.org/node/2177901">Dynamic routes are now defined in <code>MODULE.routing.yml</code></a></li>
+                <li><a target="_blank" href="https://www.drupal.org/node/2119699">Page callbacks have been converted to controller classes</a></li>
+                <li><a target="_blank" href="https://www.drupal.org/node/2089605">Route naming convention</a></li>
+                <li><a target="_blank" href="https://www.drupal.org/node/2165243">Contextual links are now plugins defined in <code>MODULE.links.contextual.yml</code></a></li>
+                <li><a target="_blank" href="https://www.drupal.org/node/2007444">Local actions are now plugins defined in <code>MODULE.links.action.yml</code></a></li>
+                <li><a target="_blank" href="https://www.drupal.org/node/2044515">Local tasks and now plugins defined in <code>MODULE.links.task.yml</code></a></li>
+                <li><a target="_blank" href="https://www.drupal.org/node/2228089">Menu links are now defined in <code>MODULE.links.menu.yml</code></a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.module, line 301</li>
+            </ul>
+                  <aside>Flagged by _flag_hook:menu</aside>    </details>
+    <details class="warning">
+      <summary>Static permissions are now defined in <code>MODULE.permissions.yml</code>.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/2311427">Defining permissions in <code>MODULE.permissions.yml</code></a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.module, line 381</li>
+            </ul>
+            <p class="fixable">This issue can be fixed automatically.</p>      <aside>Flagged by hook_permission</aside>    </details>
+    <details class="error">
+      <summary>Module info files' <code>core</code> key must have a value of <code>8.x</code>.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/1935708"><code>.info</code> files are now <code>.info.yml</code> files</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.info</li>
+            </ul>
+                  <aside>Flagged by info</aside>    </details>
+    <details class="error">
+      <summary>Info files must contain a <code>type</code> key.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/1935708#type"><code>.info</code> files are now <code>.info.yml</code> files</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.info</li>
+            </ul>
+                  <aside>Flagged by info</aside>    </details>
+    <details class="error">
+      <summary>Many common dependencies have moved into core.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/1935708"><code>.info</code> files are now <code>.info.yml</code> files</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.info</li>
+            </ul>
+                  <aside>Flagged by info</aside>    </details>
+    <details class="error">
+      <summary>Modules no longer declare classes in their info file.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/1935708#files"><code>.info</code> files are now <code>.info.yml</code> files</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.info</li>
+            </ul>
+                  <aside>Flagged by info</aside>    </details>
+    <details class="error">
+      <summary>Module info files' <code>configure</code> key must be a route name, not a path.</summary>
+
+      
+            <h5>Documentation</h5>
+      <ul>
+                <li><a target="_blank" href="https://www.drupal.org/node/1935708#configure"><code>.info</code> files are now <code>.info.yml</code> files</a></li>
+              </ul>
+      
+            <h5>Files Affected</h5>
+      <ul>
+              <li>modules/contrib/lexicon/lexicon.info</li>
+            </ul>
+                  <aside>Flagged by info</aside>    </details>
+
+    </details>
+    </body>
+</html>

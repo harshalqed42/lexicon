@@ -1,0 +1,4 @@
+laxicon.config:
+  route_name: laxicon.config
+  base_route: laxicon.config
+  title: 'Synchronize'

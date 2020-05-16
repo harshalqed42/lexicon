@@ -1,0 +1,7 @@
+name: Lexicon
+type: module
+description: Maintain one or more lexicons on your site and optionally mark term from one or more lexicons in the content of the website.
+core: 8.x
+dependencies:
+  - drupal:taxonomy
+  - drupal:field
