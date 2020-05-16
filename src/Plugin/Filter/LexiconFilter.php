@@ -32,12 +32,39 @@ class LexiconFilter extends FilterBase {
         $vids = ['test1'];
         $terms = $this->lexicon_get_terms($vids);
         $terms_replace = array();
+        if (is_array($terms)) {
+            foreach ($terms as $term) {
+                // If the term is equal to $current_term than skip marking that term.
+                if ($current_term == $term->tid) {
+                    continue;
+                }
+                $term_title = $term->safe_description;
+                $fragment = NULL;
+//                if (!empty($vids) && (variable_get('lexicon_click_option', 0) == 1)) {
+                if (!empty($vids) ) {
+//                    if (!variable_get('lexicon_allow_no_description', FALSE) && empty($term_title)) {
+                      if ( empty($term_title)) {
+                          continue;
+                      }
+//                    if (variable_get('lexicon_page_per_letter', FALSE)) {
+                    if (FALSE) {
+                    //   $linkto = variable_get('lexicon_path_' . $term->vid, 'lexicon/' . $term->vid) . '/letter_' . drupal_strtolower(drupal_substr($term->name, 0, 1));
+                    }
+                    else {
+                        $linkto = 'lexicon/' . $term->vid;//variable_get('lexicon_path_' . $term->vid, 'lexicon/' . $term->vid);
+                    }
+
+                    // Create a valid anchor id.
+                    $fragment = _lexicon_create_valid_id($term->name);
+
+                    }
 
 
 
 
 
-        $replace = '<span class="celebrate-filter">' . $this->t('Good Times!') . '</span>';
+
+                    $replace = '<span class="celebrate-filter">' . $this->t('Good Times!') . '</span>';
         $new_text = str_replace('[celebrate]', $replace, $text);
         return new FilterProcessResult($new_text);
     }
@@ -89,10 +116,91 @@ class LexiconFilter extends FilterBase {
                 $term->safe_description = strip_tags($term->description);
             }
             else {
+
                 $term->safe_description = check_markup($term->description, $term->format);
             }
 
+
+            // If there is an image for the term add the image information to the $term
+            // object.
+            if ($image_field != '') {
+//                $image_field_items = field_get_items('taxonomy_term', $term, $image_field);
+//                if (!empty($image_field_items)) {
+//                    $term->image['uri'] = $image_field_items[0]['uri'];
+//                    $term->image['alt'] = check_plain($image_field_items[0]['alt']);
+//                    $term->image['title'] = check_plain($image_field_items[0]['title']);
+//                }
+            }
+
+            // If there are synonyms add them to the $term object.
+            if ($synonyms_field != '') {
+//                $synonyms_field_items = field_get_items('taxonomy_term', $term, $synonyms_field);
+//                if (!empty($synonyms_field_items)) {
+//                    foreach ($synonyms_field_items as $item) {
+//                        $term->synonyms[] = $item['safe_value'];
+//                    }
+//                }
+            }
+            $path = 'lexicon/test1';//variable_get('lexicon_path_' . $term->vid, 'lexicon/' . $term->vid);
+            if ($page_per_letter) {
+               // $term->link['path'] = $path . '/letter_' . drupal_strtolower(drupal_substr($term->name, 0, 1));
+            }
+            // If the Lexicon overview shows all letters on one page the link must lead
+            // to the appropriate anchor.
+            else {
+                $term->link['path'] = $path;
+            }
+            $term->link['fragment'] = lexicon_create_valid_id($term->name);
+            // If there are related terms add the information of each related term.
+//            if ($relations = _lexicon_get_related_terms($term)) {
+//                foreach ($relations as $related) {
+//                    $term->related[$related->tid]['name'] = check_plain($related->name);
+//                    $related_path = variable_get('lexicon_path_' . $related->vid, 'lexicon/' . $related->vid);
+//                    // If the related terms have to be linked add the link information.
+//                    if ($link_related) {
+//                        if ($click_option == 1) {
+//                            // The link has to point to the term on the Lexicon page.
+//                            if ($page_per_letter) {
+//                                $term->related[$related->tid]['link']['path'] = $related_path . '/letter_' . drupal_strtolower(drupal_substr($related->name, 0, 1));
+//                            }
+//                            // If the Lexicon overview shows all letters on one page the link
+//                            // must lead to the appropriate anchor.
+//                            else {
+//                                $term->related[$related->tid]['link']['path'] = $related_path;
+//                            }
+//                            $term->related[$related->tid]['link']['fragment'] = _lexicon_create_valid_id($related->name);
+//                        }
+//                        else {
+//                            // The link has to point to the page of the term itself.
+//                            $term->related[$related->tid]['link']['path'] = 'taxonomy/term/' . $related->tid;
+//                            $term->related[$related->tid]['link']['fragment'] = '';
+//                        }
+//                    }
+//                }
+//            }
+
+            if ($show_edit && $edit_voc) {
+                $term->extralinks['edit term']['name'] = t('edit term');
+                $term->extralinks['edit term']['path'] = 'taxonomy/term/' . $term->tid . '/edit';
+                $term->extralinks['edit term']['attributes'] = array(
+                    'class' => 'lexicon-edit-term',
+                    'title' => t('edit this term and definition'),
+                    'query' => $destination,
+                );
+            }
+            if ($show_search && $access_search) {
+                $term->extralinks['search for term']['name'] = t('search for term');
+                $term->extralinks['search for term']['path'] = 'search/node/' . $term->name;
+                $term->extralinks['search for term']['attributes'] = array(
+                    'class' => 'lexicon-search-term',
+                    'title' => t('search for content using this term'),
+                    'query' => $destination,
+                );
+            }
+
+            $term->info_added = TRUE;
         }
+        return $term;
     }
 
     protected function lexicon_create_valid_id($name){
