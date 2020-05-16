@@ -562,7 +562,7 @@ function _filter_lexicon_tips($filter, $format, $long = FALSE) {
 
   foreach ($block_tags as $key => $tag) {
     if ($tag[0] == '.') {
-      $block_tags[$key] = 'span class="' . check_plain(drupal_substr($tag, 1)) . '"';
+      $block_tags[$key] = 'span class="' . check_plain(Drupal\Component\Utility\Unicode::substr($tag, 1)) . '"';
     }
   }
 
@@ -621,7 +621,7 @@ function _filter_lexicon($text, $filter, $format) {
                     continue;
                 }
                 if (variable_get('lexicon_page_per_letter', FALSE)) {
-                    $linkto = variable_get('lexicon_path_' . $term->vid, 'lexicon/' . $term->vid) . '/letter_' . drupal_strtolower(drupal_substr($term->name, 0, 1));
+                    $linkto = variable_get('lexicon_path_' . $term->vid, 'lexicon/' . $term->vid) . '/letter_' . Drupal\Component\Utility\Unicode::strtolower(Drupal\Component\Utility\Unicode::substr($term->name, 0, 1));
                 } else {
                     $linkto = variable_get('lexicon_path_' . $term->vid, 'lexicon/' . $term->vid);
                 }
@@ -752,6 +752,7 @@ function _filter_lexicon($text, $filter, $format) {
  * tags and matches, then those 'events' are sorted and handled one by one.
  */
 function _lexicon_insertlink(&$text, &$terms_replace) {
+  $config = \Drupal::config('lexicon.settings');
   $multibyte_enabled = extension_loaded('mbstring');
   if ($multibyte_enabled) {
     $mb_prefix = 'mb_';
@@ -759,12 +760,12 @@ function _lexicon_insertlink(&$text, &$terms_replace) {
   else {
     $mb_prefix = NULL;
   }
-  $case_sensitive = variable_get('lexicon_case', '1');
+  $case_sensitive = $config->get('lexicon_case', '1');
   $findfunc = $mb_prefix . 'strpos';
   $findtagfunc = $mb_prefix . 'strpos';
 
-  $replaceall = variable_get('lexicon_replace_all', 0);
-  $replace_mode = variable_get('lexicon_replace', 'superscript');
+  $replaceall = $config->get('lexicon_replace_all', 0);
+  $replace_mode = $config->get('lexicon_replace', 'superscript');
 
   $events = array();
 
@@ -772,7 +773,7 @@ function _lexicon_insertlink(&$text, &$terms_replace) {
   $open_tags = array('[no-lexicon]', '<', '<a ', '[code');
   $close_tags = array('[/no-lexicon]', '>', '</a>', '[/code]');
 
-  $user_tags = explode(' ', variable_get('lexicon_blocking_tags', 'abbr acronym'));
+  $user_tags = explode(' ', $config->get('lexicon_blocking_tags', 'abbr acronym'));
   foreach ($user_tags as $tag) {
     if (!empty($tag)) {
       if (ctype_alnum($tag)) {
@@ -780,58 +781,58 @@ function _lexicon_insertlink(&$text, &$terms_replace) {
         $close_tags[] = '</$tag>';
       }
       elseif ($tag[0] == '.') {
-        $open_tags[] = '<span class="' . drupal_substr($tag, 1);
+        $open_tags[] = '<span class="' . Drupal\Component\Utility\Unicode::substr($tag, 1);
         $close_tags[] = '</span>';
       }
     }
   }
 
-  $searchtext = $case_sensitive ? $text : drupal_strtolower($text);
-
+  $searchtext = $case_sensitive ? $text : Drupal\Component\Utility\Unicode::strtolower($text);
+  
   foreach ($open_tags as $i => $tag) {
     $offset = 0;
     while (($offset = $findtagfunc($searchtext, $tag, $offset)) !== FALSE) {
       // Longer tags will override shorter '<' on the same offset.
       $events[$offset] = array('type' => 'open', 'which' => $i);
-      $offset += drupal_strlen($tag);
+      $offset += Drupal\Component\Utility\Unicode::strlen($tag);
     }
   }
-
+  
   // Find match candidates.
   foreach ($terms_replace as $i => $term) {
     $name = $term['term']->name;
     // Search for term name in content.
     if (!$case_sensitive) {
-        $name = drupal_strtolower($name);
+        $name = Drupal\Component\Utility\Unicode::strtolower($name);
     }
     $offset = 0;
     $first_match_found = FALSE;
     while (($offset = $findfunc($searchtext, $name, $offset)) !== FALSE) {
-      $len = drupal_strlen($name);
-      $match = drupal_substr($text, $offset, $len);
+      $len = Drupal\Component\Utility\Unicode::strlen($name);
+      $match = Drupal\Component\Utility\Unicode::substr($text, $offset, $len);
       // Check if the match that was found is a proper match by the match
       // setting.
-      $matchlen = drupal_strlen($match);
+      $matchlen = Drupal\Component\Utility\Unicode::strlen($match);
       $proper_match = FALSE;
-      switch (variable_get('lexicon_match', 'b')) {
+      switch ($config->get('lexicon_match', 'b')) {
         // Require word break left or right.
         case 'lr':
-          $proper_match = (_lexicon_is_boundary(drupal_substr($text, $offset - 1, 1)) || _lexicon_is_boundary(drupal_substr($text, $offset + $matchlen, 1)));
+          $proper_match = (_lexicon_is_boundary(Drupal\Component\Utility\Unicode::substr($text, $offset - 1, 1)) || _lexicon_is_boundary(Drupal\Component\Utility\Unicode::substr($text, $offset + $matchlen, 1)));
           break;
 
         // Require word break left and right.
         case 'b':
-          $proper_match = (_lexicon_is_boundary(drupal_substr($text, $offset - 1, 1)) && _lexicon_is_boundary(drupal_substr($text, $offset + $matchlen, 1)));
+          $proper_match = (_lexicon_is_boundary(Drupal\Component\Utility\Unicode::substr($text, $offset - 1, 1)) && _lexicon_is_boundary(Drupal\Component\Utility\Unicode::substr($text, $offset + $matchlen, 1)));
           break;
 
         // Require word break left.
         case 'l':
-          $proper_match = _lexicon_is_boundary(drupal_substr($text, $offset - 1, 1));
+          $proper_match = _lexicon_is_boundary(Drupal\Component\Utility\Unicode::substr($text, $offset - 1, 1));
           break;
 
         // Require word break right.
         case 'r':
-          $proper_match = _lexicon_is_boundary(drupal_substr($text, $offset + $matchlen, 1));
+          $proper_match = _lexicon_is_boundary(Drupal\Component\Utility\Unicode::substr($text, $offset + $matchlen, 1));
           break;
 
         // Match any substring.
@@ -842,7 +843,7 @@ function _lexicon_insertlink(&$text, &$terms_replace) {
       }
       if ($proper_match) {
         // Only longer matches override shorter ones.
-        if (!isset($events[$offset]) || drupal_strlen($events[$offset]['match']) < drupal_strlen($match)) {
+        if (!isset($events[$offset]) || Drupal\Component\Utility\Unicode::strlen($events[$offset]['match']) < Drupal\Component\Utility\Unicode::strlen($match)) {
           // Get synonym with case as in text.
           $events[$offset] = array(
             'type' => 'match',
@@ -861,36 +862,36 @@ function _lexicon_insertlink(&$text, &$terms_replace) {
     if (isset($term['term']->synonyms)) {
       foreach ($term['term']->synonyms as $synonym) {
         if (!$case_sensitive) {
-          $synonym = drupal_strtolower($synonym);
+          $synonym = Drupal\Component\Utility\Unicode::strtolower($synonym);
         }
         $offset = 0;
         $first_match_found = FALSE;
         while (($offset = $findfunc($searchtext, $synonym, $offset)) !== FALSE) {
-          $len = drupal_strlen($synonym);
-          $match = drupal_substr($text, $offset, $len);
+          $len = Drupal\Component\Utility\Unicode::strlen($synonym);
+          $match = Drupal\Component\Utility\Unicode::substr($text, $offset, $len);
           // Check if the match that was found is a proper match according to
           // the match setting.
-          $matchlen = drupal_strlen($match);
+          $matchlen = Drupal\Component\Utility\Unicode::strlen($match);
           $proper_match = FALSE;
           switch (variable_get('lexicon_match', 'b')) {
             // Require word break left or right.
             case 'lr':
-              $proper_match = (_lexicon_is_boundary(drupal_substr($text, $offset - 1, 1)) || _lexicon_is_boundary(drupal_substr($text, $offset + $matchlen, 1)));
+              $proper_match = (_lexicon_is_boundary(Drupal\Component\Utility\Unicode::substr($text, $offset - 1, 1)) || _lexicon_is_boundary(Drupal\Component\Utility\Unicode::substr($text, $offset + $matchlen, 1)));
               break;
 
             // Require word break left and right.
             case 'b':
-              $proper_match = (_lexicon_is_boundary(drupal_substr($text, $offset - 1, 1)) && _lexicon_is_boundary(drupal_substr($text, $offset + $matchlen, 1)));
+              $proper_match = (_lexicon_is_boundary(Drupal\Component\Utility\Unicode::substr($text, $offset - 1, 1)) && _lexicon_is_boundary(Drupal\Component\Utility\Unicode::substr($text, $offset + $matchlen, 1)));
               break;
 
             // Require word break left.
             case 'l':
-              $proper_match = _lexicon_is_boundary(drupal_substr($text, $offset - 1, 1));
+              $proper_match = _lexicon_is_boundary(Drupal\Component\Utility\Unicode::substr($text, $offset - 1, 1));
               break;
 
             // Require word break right.
             case 'r':
-              $proper_match = _lexicon_is_boundary(drupal_substr($text, $offset + $matchlen, 1));
+              $proper_match = _lexicon_is_boundary(Drupal\Component\Utility\Unicode::substr($text, $offset + $matchlen, 1));
               break;
 
             // Match any substring.
@@ -901,7 +902,7 @@ function _lexicon_insertlink(&$text, &$terms_replace) {
           }
           if ($proper_match) {
             // Only longer matches override shorter ones.
-            if (!isset($events[$offset]) || drupal_strlen($events[$offset]['match']) < drupal_strlen($match)) {
+            if (!isset($events[$offset]) || Drupal\Component\Utility\Unicode::strlen($events[$offset]['match']) < Drupal\Component\Utility\Unicode::strlen($match)) {
               // Get synonym with case as in text.
               $events[$offset] = array(
                 'type' => 'match',
@@ -934,29 +935,29 @@ function _lexicon_insertlink(&$text, &$terms_replace) {
       continue;
     }
     // Copy plain text (with no events).
-    $newtext .= drupal_substr($text, $parsed, ($place - $parsed));
+    $newtext .= Drupal\Component\Utility\Unicode::substr($text, $parsed, ($place - $parsed));
     $parsed = $place;
     // If a blocking tag is opened, skip to closing tag.
     if ($event['type'] == 'open') {
       $skip = $findtagfunc($text, $close_tags[$event['which']], $place);
       if ($skip === FALSE) {
-        $skip = drupal_strlen($text);
+        $skip = Drupal\Component\Utility\Unicode::strlen($text);
       }
       // If the tag is [no-lexicon] - remove it with the closing tag
       // (by incrementing $parsed without copying).
       if ($event['which'] == 0) {
-        $parsed += drupal_strlen($open_tags[$event['which']]);
-        $newtext .= drupal_substr($text, $parsed, ($skip - $parsed));
-        $parsed = $skip + drupal_strlen($close_tags[$event['which']]);
+        $parsed += Drupal\Component\Utility\Unicode::strlen($open_tags[$event['which']]);
+        $newtext .= Drupal\Component\Utility\Unicode::substr($text, $parsed, ($skip - $parsed));
+        $parsed = $skip + Drupal\Component\Utility\Unicode::strlen($close_tags[$event['which']]);
       }
       // Copy text without changing it.
       else {
-        $newtext .= drupal_substr($text, $parsed, ($skip - $parsed));
+        $newtext .= Drupal\Component\Utility\Unicode::substr($text, $parsed, ($skip - $parsed));
         $parsed = $skip;
       }
     }
     if ($event['type'] == 'match') {
-      $matchlen = drupal_strlen($event['match']);
+      $matchlen = Drupal\Component\Utility\Unicode::strlen($event['match']);
       if ($replace_mode == 'template') {
         $newtext .= theme('lexicon_mark_term', array('term' => $terms_replace[$event['which']], 'text' => $event['match']));
       }
@@ -966,8 +967,9 @@ function _lexicon_insertlink(&$text, &$terms_replace) {
       $parsed += $matchlen;
     }
   }
+  
   // Append remaining part.
-  return $newtext . drupal_substr($text, $parsed);
+  return $newtext . Drupal\Component\Utility\Unicode::substr($text, $parsed);
 }
 
 /**
@@ -1062,7 +1064,7 @@ function _lexicon_term_add_info(&$term, $filter = FALSE) {
     // If the Lexicon is spread over seperate pages per letter the link must
     // lead to the appropriate page with the correct anchor.
     if ($page_per_letter) {
-      $term->link['path'] = $path . '/letter_' . drupal_strtolower(drupal_substr($term->name, 0, 1));
+      $term->link['path'] = $path . '/letter_' . Drupal\Component\Utility\Unicode::strtolower(Drupal\Component\Utility\Unicode::substr($term->name, 0, 1));
     }
     // If the Lexicon overview shows all letters on one page the link must lead
     // to the appropriate anchor.
@@ -1081,7 +1083,7 @@ function _lexicon_term_add_info(&$term, $filter = FALSE) {
           if ($click_option == 1) {
             // The link has to point to the term on the Lexicon page.
             if ($page_per_letter) {
-              $term->related[$related->tid]['link']['path'] = $related_path . '/letter_' . drupal_strtolower(drupal_substr($related->name, 0, 1));
+              $term->related[$related->tid]['link']['path'] = $related_path . '/letter_' . Drupal\Component\Utility\Unicode::strtolower(Drupal\Component\Utility\Unicode::substr($related->name, 0, 1));
             }
             // If the Lexicon overview shows all letters on one page the link
             // must lead to the appropriate anchor.
