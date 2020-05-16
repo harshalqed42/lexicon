@@ -608,145 +608,136 @@ function _filter_lexicon($text, $filter, $format) {
     $tip_list = array();
 
     if (is_array($terms)) {
-      foreach ($terms as $term) {
-        // If the term is equal to $current_term than skip marking that term.
-        if ($current_term == $term->tid) {
-          continue;
+        foreach ($terms as $term) {
+            // If the term is equal to $current_term than skip marking that term.
+            if ($current_term == $term->tid) {
+                continue;
+            }
+            $term_title = $term->safe_description;
+            $fragment = NULL;
+            if (!empty($vids) && (variable_get('lexicon_click_option', 0) == 1)) {
+                // If terms should not be marked if a term has no description continue with the next term.
+                if (!variable_get('lexicon_allow_no_description', FALSE) && empty($term_title)) {
+                    continue;
+                }
+                if (variable_get('lexicon_page_per_letter', FALSE)) {
+                    $linkto = variable_get('lexicon_path_' . $term->vid, 'lexicon/' . $term->vid) . '/letter_' . drupal_strtolower(drupal_substr($term->name, 0, 1));
+                } else {
+                    $linkto = variable_get('lexicon_path_' . $term->vid, 'lexicon/' . $term->vid);
+                }
+
+                // Create a valid anchor id.
+                $fragment = _lexicon_create_valid_id($term->name);
+            } else {
+                $linkto = 'taxonomy/term/' . $term->tid;
+            }
+            $term_class = variable_get('lexicon_term_class', 'lexicon-term');
+
+            if ($replace_mode == 'template') {
+                // Set the information needed by the template.
+                $terms_replace[] = array(
+                    'term' => $term,
+                    'absolute_link' => $absolute_link,
+                    'linkto' => $linkto,
+                    'fragment' => $fragment,
+                    'term_class' => $term_class,
+                );
+            } else {
+                $ins_before = $ins_after = NULL;
+                // Set the correct $ins_before and $ins_after to be used for marking.
+                switch ($replace_mode) {
+                    case 'superscript':
+                        $ins_after = '<sup class="lexicon-indicator" title="' . $term_title . '">';
+                        if ($link_style == 'none') {
+                            $ins_after .= variable_get('lexicon_superscript', 'i');
+                        } else {
+                            $ins_after .= l(variable_get('lexicon_superscript', 'i'), $linkto, array(
+                                'attributes' => array(
+                                    'title' => $term_title,
+                                    'class' => array(
+                                        $term_class,
+                                    ),
+                                ),
+                                'fragment' => $fragment,
+                                'absolute' => $absolute_link,
+                            ));
+                        }
+                        $ins_after .= '</sup>';
+                        break;
+
+                    case 'abbr':
+                        if ($link_style == 'none') {
+                            $ins_before .= '<span class="' . $term_class . '" title="' . check_plain($term_title) . '"><' . $replace_mode . ' title="' . check_plain($term_title) . '">';
+                            $ins_after .= '</' . $replace_mode . '></span>';
+                        } else {
+                            $ins_before .= '<' . $replace_mode . ' title="' . check_plain($term_title) . '"><a class="' . $term_class . '" href="' . url($linkto, array('fragment' => $fragment, 'absolute' => $absolute_link)) . '" title="' . check_plain($term_title) . '">';
+                            $ins_after .= '</a></' . $replace_mode . '>';
+                        }
+                        break;
+
+                    case 'acronym':
+                    case 'cite':
+                    case 'dfn':
+                        if ($link_style == 'none') {
+                            $ins_after .= '</' . $replace_mode . '>';
+                        } else {
+                            $ins_before .= '<a class="' . $term_class . '" href="' . url($linkto, array('fragment' => $fragment, 'absolute' => $absolute_link)) . '">';
+                            $ins_after .= '</' . $replace_mode . '></a>';
+                        }
+                        $ins_before .= '<' . $replace_mode . ' title="' . check_plain($term_title) . '">';
+                        break;
+
+                    case 'iconterm':
+                        // Icon format, plus term link.
+                        $img = '<img src="' . base_path() . variable_get('lexicon_icon', '/imgs/lexicon.gif') . "\" />";
+                        if ($link_style == 'none') {
+                            $ins_after .= $img;
+                        } else {
+                            $ins_before .= '<a class="' . $term_class . '" href="' . url($linkto, array('fragment' => $fragment, 'absolute' => $absolute_link)) . '" title="' . check_plain($term_title) . '">';
+                            $ins_after = $img . '</a>';
+                        }
+                        break;
+
+                    case 'icon':
+                        // Icon format.
+                        $img = '<img src="' . base_path() . variable_get('lexicon_icon', '/imgs/lexicon.gif') . "\" />";
+                        if ($link_style == 'none') {
+                            $ins_after .= $img;
+                        } else {
+                            $ins_after = l($img, $linkto, array(
+                                'attributes' => array(
+                                    'title' => $term_title,
+                                    'class' => 'lexicon-icon',
+                                ),
+                                'fragment' => $fragment,
+                                'absolute' => $absolute_link,
+                                'html' => TRUE,
+                            ));
+                        }
+                        break;
+
+                    case 'term':
+                        // Term format.
+                        if ($link_style == 'none') {
+                            $ins_before = '<span class="' . $term_class . '">';
+                            $ins_after = '</span>';
+                        } else {
+                            $ins_before = '<a class="' . $term_class . '" href="' . url($linkto, array('fragment' => $fragment, 'absolute' => $absolute_link)) . '" title="' . check_plain($term_title) . '">';
+                            $ins_after = '</a>';
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+
+                $terms_replace[] = array(
+                    'term' => $term,
+                    'ins_before' => $ins_before,
+                    'ins_after' => $ins_after,
+                );
+            }
         }
-        $term_title = $term->safe_description;
-        $fragment = NULL;
-        if (!empty($vids) && (variable_get('lexicon_click_option', 0) == 1)) {
-          // If terms should not be marked if a term has no description continue with the next term.
-          if (!variable_get('lexicon_allow_no_description', FALSE) && empty($term_title)) {
-            continue;
-          }
-          if (variable_get('lexicon_page_per_letter', FALSE)) {
-            $linkto = variable_get('lexicon_path_' . $term->vid, 'lexicon/' . $term->vid) . '/letter_' . drupal_strtolower(drupal_substr($term->name, 0, 1));
-          }
-          else {
-            $linkto = variable_get('lexicon_path_' . $term->vid, 'lexicon/' . $term->vid);
-          }
-
-          // Create a valid anchor id.
-          $fragment = _lexicon_create_valid_id($term->name);
-        }
-        else {
-          $linkto = 'taxonomy/term/' . $term->tid;
-        }
-        $term_class = variable_get('lexicon_term_class', 'lexicon-term');
-
-        if ($replace_mode == 'template') {
-          // Set the information needed by the template.
-          $terms_replace[] = array(
-            'term' => $term,
-            'absolute_link' => $absolute_link,
-            'linkto' => $linkto,
-            'fragment' => $fragment,
-            'term_class' => $term_class,
-          );
-        }
-        else {
-          $ins_before = $ins_after = NULL;
-          // Set the correct $ins_before and $ins_after to be used for marking.
-          switch ($replace_mode) {
-            case 'superscript':
-              $ins_after = '<sup class="lexicon-indicator" title="' . $term_title . '">';
-              if ($link_style == 'none') {
-                $ins_after .= variable_get('lexicon_superscript', 'i');
-              }
-              else {
-                $ins_after .= l(variable_get('lexicon_superscript', 'i'), $linkto, array(
-                  'attributes' => array(
-                    'title' => $term_title,
-                    'class' => array(
-                      $term_class,
-                    ),
-                  ),
-                  'fragment' => $fragment,
-                  'absolute' => $absolute_link,
-                ));
-              }
-              $ins_after .= '</sup>';
-              break;
-
-            case 'abbr':
-              if ($link_style == 'none') {
-                $ins_before .= '<span class="' . $term_class . '" title="' . check_plain($term_title) . '"><' . $replace_mode . ' title="' . check_plain($term_title) . '">';
-                $ins_after .= '</' . $replace_mode . '></span>';
-              }
-              else {
-                $ins_before .= '<' . $replace_mode . ' title="' . check_plain($term_title) . '"><a class="' . $term_class . '" href="' . url($linkto, array('fragment' => $fragment, 'absolute' => $absolute_link)) . '" title="' . check_plain($term_title) . '">';
-                $ins_after .= '</a></' . $replace_mode . '>';
-              }
-              break;
-
-            case 'acronym':
-            case 'cite':
-            case 'dfn':
-              if ($link_style == 'none') {
-                $ins_after .= '</' . $replace_mode . '>';
-              }
-              else {
-                $ins_before .= '<a class="' . $term_class . '" href="' . url($linkto, array('fragment' => $fragment, 'absolute' => $absolute_link)) . '">';
-                $ins_after .= '</' . $replace_mode . '></a>';
-              }
-              $ins_before .= '<' . $replace_mode . ' title="' . check_plain($term_title) . '">';
-              break;
-
-            case 'iconterm':
-              // Icon format, plus term link.
-              $img = '<img src="' . base_path() . variable_get('lexicon_icon', '/imgs/lexicon.gif') . "\" />";
-              if ($link_style == 'none') {
-                $ins_after .= $img;
-              }
-              else {
-                $ins_before .= '<a class="' . $term_class . '" href="' . url($linkto, array('fragment' => $fragment, 'absolute' => $absolute_link)) . '" title="' . check_plain($term_title) . '">';
-                $ins_after = $img . '</a>';
-              }
-              break;
-
-            case 'icon':
-              // Icon format.
-              $img = '<img src="' . base_path() . variable_get('lexicon_icon', '/imgs/lexicon.gif') . "\" />";
-              if ($link_style == 'none') {
-                $ins_after .= $img;
-              }
-              else {
-                $ins_after = l($img, $linkto, array(
-                  'attributes' => array(
-                    'title' => $term_title,
-                    'class' => 'lexicon-icon',
-                  ),
-                  'fragment' => $fragment,
-                  'absolute' => $absolute_link,
-                  'html' => TRUE,
-                ));
-              }
-              break;
-
-            case 'term':
-              // Term format.
-              if ($link_style == 'none') {
-                $ins_before = '<span class="' . $term_class . '">';
-                $ins_after = '</span>';
-              }
-              else {
-                $ins_before = '<a class="' . $term_class . '" href="' . url($linkto, array('fragment' => $fragment, 'absolute' => $absolute_link)) . '" title="' . check_plain($term_title) . '">';
-                $ins_after = '</a>';
-              }
-              break;
-
-            default:
-              break;
-          }
-
-          $terms_replace[] = array(
-            'term' => $term,
-            'ins_before' => $ins_before,
-            'ins_after' => $ins_after,
-          );
-        }
-      }
     }
     return _lexicon_insertlink($text, $terms_replace);
   }
