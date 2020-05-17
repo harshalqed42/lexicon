@@ -11,13 +11,6 @@ use Drupal\Core\Form\FormStateInterface;
 class lexiconTitleIntrosForm extends ConfigFormBase {
 
   /**
-   * Config settings.
-   *
-   * @var string
-   */
-  const SETTINGS = 'lexicon.settings';
-
-  /**
    * {@inheritdoc}
    */
   public function getFormId() {
@@ -28,9 +21,7 @@ class lexiconTitleIntrosForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   protected function getEditableConfigNames() {
-    return [
-      static::SETTINGS,
-    ];
+    return ['lexicon.settings'];
   }
 
   /**
@@ -38,7 +29,7 @@ class lexiconTitleIntrosForm extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = [];
-    $config = $this->config(static::SETTINGS);
+    $config = $this->config('lexicon.settings');
     $vids = $config->get('lexicon_vids', []);
     $vids = array_filter($vids);
     $vids_setup = FALSE;
@@ -62,18 +53,16 @@ class lexiconTitleIntrosForm extends ConfigFormBase {
         $form['paths_and_titles_and_intros' . $vocabulary_name]['lexicon_path_' . $vocabulary_name] = [
           '#type' => 'textfield',
           '#title' => t('The path of the lexicon for this vocabulary'),
-          // '#default_value' => variable_get('lexicon_path_' . $vid, 'lexicon/' . $vid),
           '#description' => t('Determines the path that is used for the lexicon page for this vocabulary. Default is: <em>%path</em>.', ['%path' => 'lexicon/' . $vocabulary_name]),
           '#required' => TRUE,
-          '#default_value' => ($config->get('lexicon_path_' . $vocabulary_name) ? $config->get('lexicon_path_' . $vocabulary_name) : ''),
+          '#default_value' => ($config->get('lexicon_path_' . $vocabulary_name) ? $config->get('lexicon_path_' . $vocabulary_name) : 'lexicon/' . $vocabulary_name),
         ];
         $form['paths_and_titles_and_intros' . $vocabulary_name]['lexicon_title_' . $vocabulary_name] = [
           '#type' => 'textfield',
           '#title' => t('The title of the lexicon for this vocabulary'),
-          // '#default_value' => variable_get('lexicon_title_' . $vid, $vocabulary_name),
           '#description' => t('Determines the title that is used for the lexicon page for this vocabulary. Default is: <em>%name</em>.', ['%name' => $vocabulary_name]),
           '#required' => TRUE,
-          '#default_value' => ($config->get('lexicon_title_' . $vocabulary_name) ? $config->get('lexicon_title_' . $vocabulary_name) : ''),
+          '#default_value' => ($config->get('lexicon_title_' . $vocabulary_name) ? $config->get('lexicon_title_' . $vocabulary_name) : $vocabulary_name),
 
         ];
 
@@ -124,7 +113,7 @@ class lexiconTitleIntrosForm extends ConfigFormBase {
     $vids = $form_state->getValue('vids');
     foreach ($vids as $vid) {
       if (!empty($vids)) {
-        $this->configFactory->getEditable(static::SETTINGS)
+        $this->configFactory->getEditable('lexicon.settings')
         // Set the submitted configuration setting.
           ->set('lexicon_path_' . $vid, $form_state->getValue('lexicon_path_' . $vid))
           ->set('lexicon_title_' . $vid, $form_state->getValue('lexicon_title_' . $vid))
@@ -139,7 +128,7 @@ class lexiconTitleIntrosForm extends ConfigFormBase {
       // _lexicon_clear_filter_cache(NULL, TRUE);
     }
 
-    $this->configFactory->getEditable(static::SETTINGS)
+    $this->configFactory->getEditable('lexicon.settings')
     // Set the submitted configuration setting.
       ->set('alphabet', explode(" ", $form_state->getValue('alphabet')))
       ->set('digits', explode(" ", $form_state->getValue('digits')))
