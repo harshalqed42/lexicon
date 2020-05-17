@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Default theme implementation for displaying the Lexicon overview.
@@ -18,7 +19,6 @@
  *   lexicon-alphabar.tpl.php.
  * - $lexicon_overview_sections: Lexicon overview sections as rendered by
  *   lexicon-overview-section.tpl.php.
- *
  */
 ?>
 <div id="<?php print $lexicon_overview->voc_name ?>">
@@ -38,11 +38,11 @@
       <?php print $section; ?>
       <?php if (isset($lexicon_overview->go_to_top_link)) : ?>
         <p>
-          <?php print l($lexicon_overview->go_to_top_link["name"], '#', array(
+          <?php print l($lexicon_overview->go_to_top_link["name"], '#', [
             'fragment' => $lexicon_overview->go_to_top_link["fragment"],
             'attributes' => $lexicon_overview->go_to_top_link["attributes"],
             'external' => TRUE,
-          )); ?>
+          ]); ?>
         </p>
       <?php endif; ?>
     <?php endforeach; ?>

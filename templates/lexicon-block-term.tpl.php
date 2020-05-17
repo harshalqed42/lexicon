@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Default theme implementation for displaying a single Lexicon term in the
@@ -36,7 +37,7 @@
   <?php endif; ?>
   <div class="lexicon-block-term-name">
     <?php if (isset($term->link)) : ?>
-      <?php print l($term->safe_name, $term->link["path"], array('fragment' => $term->link["fragment"])); ?>
+      <?php print l($term->safe_name, $term->link["path"], ['fragment' => $term->link["fragment"]]); ?>
     <?php else : ?>
       <?php print $term->safe_name; ?>
     <?php endif; ?>
@@ -58,7 +59,7 @@
       <?php print t('See also') . ': '; ?>
       <?php foreach ($term->related as $related_term) : ?>
         <?php if (isset($related_term["link"])) : ?>
-          <?php print l($related_term["name"], $related_term["link"]["path"], array('fragment' => $related_term["link"]["fragment"])); ?>
+          <?php print l($related_term["name"], $related_term["link"]["path"], ['fragment' => $related_term["link"]["fragment"]]); ?>
         <?php else : ?>
           <?php print $related_term["name"]; ?>
         <?php endif; ?>
