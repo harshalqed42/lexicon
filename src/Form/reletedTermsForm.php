@@ -13,13 +13,6 @@ use Drupal\Core\Form\FormStateInterface;
 class reletedTermsForm extends ConfigFormBase {
 
   /**
-   * Config settings.
-   *
-   * @var string
-   */
-  const SETTINGS = 'lexicon.settings';
-
-  /**
    * {@inheritdoc}
    */
   public function getFormId() {
@@ -30,9 +23,7 @@ class reletedTermsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   protected function getEditableConfigNames() {
-    return [
-      static::SETTINGS,
-    ];
+    return ['lexicon.settings'];
   }
 
   /**
@@ -40,7 +31,7 @@ class reletedTermsForm extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = [];
-    $config = $this->config(static::SETTINGS);
+    $config = $this->config('lexicon.settings');
     $vids = $config->get('lexicon_vids', []);
     $vids = array_filter($vids);
     $vocs = taxonomy_vocabulary_get_names();
@@ -49,7 +40,7 @@ class reletedTermsForm extends ConfigFormBase {
       '#type' => 'value',
       '#value' => $vids,
     ];
-    $config = $this->config(static::SETTINGS);
+    $config = $this->config('lexicon.settings');
     foreach ($vids as $vid) {
       // Don't create form-items for vocabularies that have not been setup as
       // Lexicon vocabularies.
@@ -178,7 +169,7 @@ class reletedTermsForm extends ConfigFormBase {
 
     foreach ($vids as $vid) {
       if (!empty($vid)) {
-        $this->configFactory->getEditable(static::SETTINGS)
+        $this->configFactory->getEditable('lexicon.settings')
           ->set('lexicon_related_terms_field_' . $vid, $form_state->getValues()['lexicon_related_terms_field_' . $vid])
           ->set('lexicon_synonyms_field_' . $vid, $form_state->getValues()['lexicon_synonyms_field_' . $vid])
           ->set('lexicon_image_field_' . $vid, $form_state->getValues()['lexicon_image_field_' . $vid])
