@@ -1,4 +1,16 @@
-laxicon.config:
-  route_name: laxicon.config
-  base_route: laxicon.config
-  title: 'Synchronize'
+lexicon.config:
+  route_name: lexicon.config
+  base_route: lexicon.config
+  title: 'General Configurations'
+lexicon.alphabar:
+  route_name: lexicon.alphabar
+  base_route: lexicon.config
+  title: 'Alphabar settings'
+lexicon.intro:
+  route_name: lexicon.intro
+  base_route: lexicon.config
+  title: 'Path title and intro settings'
+lexicon.related:
+  route_name: lexicon.related
+  base_route: lexicon.config
+  title: 'Releted terms, synonyms, And image settings'

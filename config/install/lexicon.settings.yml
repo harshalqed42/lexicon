@@ -1,0 +1,25 @@
+lexicon_vids: {  }
+lexicon_allow_no_description: 0
+lexicon_page_per_letter: 0
+lexicon_separate_letters: 0
+lexicon_show_description: 0
+lexicon_link_to_term_page: 0
+lexicon_link_related: 0
+lexicon_click_option: '0'
+lexicon_show_edit: 0
+lexicon_show_search: 0
+lexicon_go_to_top_link: 0
+lexicon_go_to_top_link_fragment: ''
+lexicon_local_links_scroll: 0
+lexicon_mark_terms: 0
+lexicon_match: b
+lexicon_case: '0'
+lexicon_replace_all: '0'
+lexicon_blocking_tags: ''
+lexicon_replace: null
+lexicon_superscript: ''
+lexicon_icon: ''
+lexicon_link: none
+lexicon_term_class: ''
+lexicon_disable_indicator: 0
+lexicon_clear_filter_cache_on_submit: 0

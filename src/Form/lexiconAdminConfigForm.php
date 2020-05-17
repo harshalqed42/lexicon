@@ -13,13 +13,6 @@ use Drupal\Core\Url;
 class lexiconAdminConfigForm extends ConfigFormBase {
 
   /**
-   * Config settings.
-   *
-   * @var string
-   */
-  const SETTINGS = 'lexicon.settings';
-
-  /**
    * {@inheritdoc}
    */
   public function getFormId() {
@@ -30,16 +23,14 @@ class lexiconAdminConfigForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   protected function getEditableConfigNames() {
-    return [
-      static::SETTINGS,
-    ];
+    return ['lexicon.settings'];
   }
 
   /**
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->config(static::SETTINGS);
+    $config = $this->config('lexicon.settings');
     $form = [];
     $form['general'] = [
       '#type' => 'fieldset',
@@ -62,7 +53,7 @@ class lexiconAdminConfigForm extends ConfigFormBase {
     $form['general']['lexicon_vids'] = [
       '#type' => 'checkboxes',
       '#title' => t('Which vocabularies act as lexicons.'),
-      '#default_value' => $config->get('lexicon_vids'),
+      '#default_value' => $config->get('lexicon_vids') ?? [],
       '#options' => $options,
       '#description' => t('Select one or more vocabularies which hold terms for your lexicons.'),
       '#multiple' => TRUE,
@@ -73,7 +64,6 @@ class lexiconAdminConfigForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => t('Show/mark lexicon terms even if there is no description.'),
       '#default_value' => $config->get('lexicon_allow_no_description'),
-        // '#default_value' => variable_get('lexicon_allow_no_description', FALSE),
       '#description' => t('By default, Lexicon does not show/mark terms if there is no term description. This setting overrides that. This is useful on free-tagging vocabularies that rarely get descriptions.'),
     ];
 
@@ -86,7 +76,6 @@ class lexiconAdminConfigForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => t('Show lexicon across many smaller pages.'),
       '#default_value' => $config->get('lexicon_page_per_letter'),
-        // '#default_value' => variable_get('lexicon_page_per_letter', FALSE),
       '#description' => t('Do you want to show all terms on one lexicon page or break up the lexicon into a page for each first letter (i.e. many pages).'),
     ];
 
@@ -94,7 +83,6 @@ class lexiconAdminConfigForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => t('Separate letters.'),
       '#default_value' => $config->get('lexicon_separate_letters'),
-        // '#default_value' => variable_get('lexicon_separate_letters', FALSE),
       '#description' => t('Separate the terms by the first letters. This will create heading with the letter at the beginning of each section. If the terms are not separated by the first letters, no alphabar will be shown.'),
       '#states' => [
         'visible' => [
@@ -109,7 +97,6 @@ class lexiconAdminConfigForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => t('Show lexicon term descriptions.'),
       '#default_value' => $config->get('lexicon_show_description'),
-        // '#default_value' => variable_get('lexicon_show_description', FALSE),
       '#description' => t('Lexicon term descriptions may be large and/or include pictures, therefore the Lexicon can take a long time to load if you include the full descriptions.'),
     ];
 
@@ -117,7 +104,6 @@ class lexiconAdminConfigForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => t('Link terms to the taxonomy term page.'),
       '#default_value' => $config->get('lexicon_link_to_term_page'),
-        // '#default_value' => variable_get('lexicon_link_to_term_page', FALSE),
       '#description' => t('Do you want the term names to link to their taxonomy term page?'),
     ];
 
@@ -125,7 +111,6 @@ class lexiconAdminConfigForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => t('Link related terms on the Lexicon page.'),
       '#default_value' => $config->get('lexicon_link_related'),
-        // '#default_value' => variable_get('lexicon_link_related', TRUE),
       '#description' => t('Do you want terms that are related to link to each other?'),
     ];
 
@@ -138,7 +123,6 @@ class lexiconAdminConfigForm extends ConfigFormBase {
       '#title' => t('Clicking on a term link will:'),
       '#options' => $click_options,
       '#default_value' => $config->get('lexicon_click_option'),
-        // '#default_value' => variable_get('lexicon_click_option', 1),
       '#description' => t('Set the link to show only the single term by using the default taxonomy single term view or go to the lexicon overview.'),
     ];
 
@@ -146,7 +130,6 @@ class lexiconAdminConfigForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => t('Show "edit" link.'),
       '#default_value' => $config->get('lexicon_show_edit'),
-        // '#default_value' => variable_get('lexicon_show_edit', TRUE),
       '#description' => t('Determines whether or not to show an "edit term" link for each entry.'),
     ];
 
@@ -154,7 +137,6 @@ class lexiconAdminConfigForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => t('Show "search" link.'),
       '#default_value' => $config->get('lexicon_show_search'),
-        // '#default_value' => variable_get('lexicon_show_search', TRUE),
       '#description' => t('Determines whether or not to show an "search for term" link for each entry.'),
     ];
 
@@ -162,7 +144,6 @@ class lexiconAdminConfigForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => t('Show "go to top" link.'),
       '#default_value' => $config->get('lexicon_go_to_top_link'),
-        // '#default_value' => variable_get('lexicon_go_to_top_link', FALSE),
       '#description' => t('Determines whether or not to show a "go to top" link after each group of lexicon items per letter.'),
     ];
 
@@ -170,7 +151,6 @@ class lexiconAdminConfigForm extends ConfigFormBase {
       '#type' => 'textfield',
       '#title' => t('"Go to top" link anchor name.'),
       '#default_value' => $config->get('lexicon_go_to_top_link_fragment'),
-        // '#default_value' => variable_get('lexicon_go_to_top_link_fragment', 'top'),
       '#description' => t('Sets the "go to top" link anchor name to link to.'),
       '#states' => [
         'invisible' => [
@@ -188,10 +168,15 @@ class lexiconAdminConfigForm extends ConfigFormBase {
       '#description' => t('Determines whether or not to animate scrolling to sections when following local links on the page.'),
     ];
 
+    $text_format_settings = Link::fromTextAndUrl(
+      $this->t('Text format settings'), Url::fromRoute('filter.admin_overview')
+    );
     $form['mark_terms'] = [
       '#type' => 'fieldset',
       '#title' => t('Term marking settings'),
-      '#description' => $this->t('You have to enable the <em>Lexicon Filter</em> in one or more text formats in the !text_format_settings to enable term marking in content.', [Link::fromTextAndUrl($this->t('Text format settings'), Url::fromRoute('filter.admin_overview'))]),
+      '#description' => $this->t('You have to enable the <em>Lexicon Filter</em> in one or more text formats in the @text_format_settings to enable term marking in content.', [
+        '@text_format_settings' => $text_format_settings->toString(),
+      ]),
     ];
 
     $form['mark_terms']['lexicon_mark_terms'] = [
@@ -281,24 +266,24 @@ class lexiconAdminConfigForm extends ConfigFormBase {
     ];
     // TODO : Add links with description.
     $indicator_options = [
-      'template' => t('Use the template file: !template_file.', [
-        '!template_file' => '<em>lexicon-mark-term.tpl.php</em>',
+      'template' => t('Use the template file: @template_file.', [
+        '@template_file' => '<em>lexicon-mark-term.tpl.php</em>',
       ]),
       'superscript' => t('Superscript'),
       'icon' => t('Icon'),
       'iconterm' => t('Icon + Term in span'),
       'term' => t('Term in span'),
-      'abbr' => t('Use !type element', [
-        '!type' => \Drupal::l('abbr', Url::fromUri('http://www.w3.org/TR/html401/struct/text.html#edef-ABBR')),
+      'abbr' => t('Use @type element', [
+        '@type' => \Drupal::l('abbr', Url::fromUri('http://www.w3.org/TR/html401/struct/text.html#edef-ABBR')),
       ]),
-      'acronym' => t('Use !type element', [
-        // '!type' => l(t('acronym'), 'http://www.w3.org/TR/html401/struct/text.html#edef-ACRONYM'),
+      'acronym' => t('Use @type element', [
+        // '@type' => l(t('acronym'), 'http://www.w3.org/TR/html401/struct/text.html#edef-ACRONYM'),
         ]),
-      'cite' => t('Use !type element', [
-        // '!type' => l(t('cite'), 'http://www.w3.org/TR/html401/struct/text.html#edef-CITE'),
+      'cite' => t('Use @type element', [
+        // '@type' => l(t('cite'), 'http://www.w3.org/TR/html401/struct/text.html#edef-CITE'),
         ]),
-      'dfn' => t('Use !type element', [
-        // '!type' => l(t('dfn'), 'http://www.w3.org/TR/html401/struct/text.html#edef-DFN'),
+      'dfn' => t('Use @type element', [
+        // '@type' => l(t('dfn'), 'http://www.w3.org/TR/html401/struct/text.html#edef-DFN'),
         ]),
     ];
 
@@ -375,12 +360,7 @@ class lexiconAdminConfigForm extends ConfigFormBase {
       '#description' => t('Changes in the filter behaviour are only visible when the filter cache is flushed. This setting ensures that the filter cache is flushed when the settings are submitted.'),
     ];
 
-    $form['submit'] = [
-      '#type' => 'submit',
-      '#value' => t('Save configuration'),
-      '#weight' => 5,
-    ];
-    return $form;
+    return parent::buildForm($form, $form_state);
   }
 
   /**
@@ -388,7 +368,7 @@ class lexiconAdminConfigForm extends ConfigFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     // Retrieve the configuration.
-    $this->configFactory->getEditable(static::SETTINGS)
+    $this->configFactory->getEditable('lexicon.settings')
     // Set the submitted configuration setting.
       ->set('lexicon_vids', array_filter($form_state->getValue('lexicon_vids')))
       ->set('lexicon_allow_no_description', $form_state->getValue('lexicon_allow_no_description'))
