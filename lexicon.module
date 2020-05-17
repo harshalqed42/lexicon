@@ -34,6 +34,8 @@ function lexicon_help($path, $arg) {
     case 'admin/modules#description':
       return t('Maintain one or more lexicons on your site.');
       break;
+    case 'lexicon.config':
+      return '<p>' . t('This page and its tabs allow you to control how the Lexicon module functions.') . '</p>';
   }
 }
 
@@ -788,7 +790,7 @@ function _lexicon_insertlink(&$text, &$terms_replace) {
   }
 
   $searchtext = $case_sensitive ? $text : Drupal\Component\Utility\Unicode::strtolower($text);
-  
+
   foreach ($open_tags as $i => $tag) {
     $offset = 0;
     while (($offset = $findtagfunc($searchtext, $tag, $offset)) !== FALSE) {
@@ -797,7 +799,7 @@ function _lexicon_insertlink(&$text, &$terms_replace) {
       $offset += Drupal\Component\Utility\Unicode::strlen($tag);
     }
   }
-  
+
   // Find match candidates.
   foreach ($terms_replace as $i => $term) {
     $name = $term['term']->name;
@@ -967,7 +969,7 @@ function _lexicon_insertlink(&$text, &$terms_replace) {
       $parsed += $matchlen;
     }
   }
-  
+
   // Append remaining part.
   return $newtext . Drupal\Component\Utility\Unicode::substr($text, $parsed);
 }

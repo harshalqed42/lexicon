@@ -1,0 +1,66 @@
+lexicon_vids: {  }
+lexicon_allow_no_description: 0
+lexicon_page_per_letter: 0
+lexicon_separate_letters: 0
+lexicon_show_description: 0
+lexicon_link_to_term_page: 0
+lexicon_link_related: 1
+lexicon_click_option: '1'
+lexicon_show_edit: 1
+lexicon_show_search: 1
+lexicon_go_to_top_link: 0
+lexicon_go_to_top_link_fragment: ''
+lexicon_local_links_scroll: 0
+lexicon_mark_terms: 1
+lexicon_match: b
+lexicon_case: '1'
+lexicon_replace_all: '1'
+lexicon_blocking_tags: 'abbr acronym'
+lexicon_replace: template
+lexicon_superscript: ''
+lexicon_icon: ''
+lexicon_link: normal
+lexicon_term_class: lexicon-term
+lexicon_disable_indicator: 0
+lexicon_clear_filter_cache_on_submit: 1
+alphabet:
+  - a
+  - b
+  - c
+  - d
+  - e
+  - f
+  - g
+  - h
+  - i
+  - j
+  - k
+  - l
+  - m
+  - 'n'
+  - o
+  - p
+  - q
+  - r
+  - s
+  - t
+  - u
+  - v
+  - w
+  - x
+  - 'y'
+  - z
+digits:
+  - '0'
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  - '7'
+  - '8'
+  - '9'
+suppress_unused: 0
+alphabar_separator: '|'
+alphabar_instruction: 'Click one of the letters above to advance the page to terms beginning with that letter.'

@@ -1,28 +1,25 @@
-laxicon.config:
+lexicon.config:
   path: '/admin/config/system/lexicon'
   defaults:
     _form: '\Drupal\lexicon\Form\lexiconAdminConfigForm'
     _title: 'Lexicon Settings'
   requirements:
     _permission: 'administer site configuration'
-
-laxicon.alphabar:
+lexicon.alphabar:
   path: '/admin/config/system/lexicon/alphabet'
   defaults:
     _form: '\Drupal\lexicon\Form\lexiconAlphabetForm'
     _title: 'Alphabar settings'
   requirements:
     _permission: 'administer site configuration'
-
-laxicon.intro:
+lexicon.intro:
   path: '/admin/config/system/lexicon/paths_and_titles_and_intros'
   defaults:
     _form: '\Drupal\lexicon\Form\lexiconTitleIntrosForm'
     _title: 'Path title and intro settings'
   requirements:
     _permission: 'administer site configuration'
-
-laxicon.related:
+lexicon.related:
   path: '/admin/config/system/lexicon/related_terms_synonyms_and_image'
   defaults:
     _form: '\Drupal\lexicon\Form\reletedTermsForm'
