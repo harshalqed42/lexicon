@@ -26,3 +26,6 @@ lexicon.related:
     _title: 'Releted terms, synonyms, And image settings'
   requirements:
     _permission: 'administer site configuration'
+# Dynamic routes for lexicon pages.
+route_callbacks:
+  - '\Drupal\lexicon\Routing\LexiconPagesRoutes::routes'

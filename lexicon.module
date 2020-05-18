@@ -9,6 +9,7 @@
  * replaces lexicon terms (and their synonyms) in the body of content that is
  * filtered by an input filter.
  */
+use Drupal\Component\Utility\Html;
 
 /**
  * Implements hook_help().
@@ -59,7 +60,7 @@ function lexicon_block_configure($delta) {
     case 'lexicon_random_term':
       $vids = array();
       // Get all vocabulary id's that are used as Lexicons.
-      $vid_list = variable_get('lexicon_vids', array());
+      $vid_list = $config->get('lexicon_vids', array());
       foreach ($vid_list as $vid) {
         // Somehow if the vocabulary is not checked on the settings page, Drupal
         // still returns 0 in the array so when the $vid != 0 we have a
@@ -67,7 +68,7 @@ function lexicon_block_configure($delta) {
         if ($vid != 0) {
           // Put the vocabulary in the options array.
           $voc = taxonomy_vocabulary_load($vid);
-          $vids[$vid] = check_plain($voc->name);
+          $vids[$vid] = Html::escape($voc->name);
         }
       }
 
@@ -82,7 +83,7 @@ function lexicon_block_configure($delta) {
         '#description' => t('Select the vocabularies to load a term from.'),
         '#required' => TRUE,
         '#options' => $vids,
-        '#default_value' => variable_get('lexicon_block_lexicon_random_term_vids', array()),
+        '#default_value' => $config->get('lexicon_block_lexicon_random_term_vids', array()),
       );
 
       $form['lexicon_block']['refresh_settings'] = array(
@@ -95,7 +96,7 @@ function lexicon_block_configure($delta) {
       $form['lexicon_block']['refresh_settings']['step'] = array(
         '#type' => 'select',
         '#title' => t('Time unit'),
-        '#default_value' => variable_get('lexicon_block_lexicon_random_term_step', 0),
+        '#default_value' => $config->get('lexicon_block_lexicon_random_term_step', 0),
         '#options' => array(
           1 => t('seconds'),
           60 => t('minutes'),
@@ -108,7 +109,7 @@ function lexicon_block_configure($delta) {
         '#type' => 'textfield',
         '#size' => 4,
         '#maxlength' => 3,
-        '#default_value' => variable_get('lexicon_block_lexicon_random_term_interval', 0),
+        '#default_value' => $config->get('lexicon_block_lexicon_random_term_interval', 0),
         '#title' => t('Update interval'),
         '#description' => t('How often do you want to load a new term? Leaving this blank or zero means that a new term is loaded every time.'),
       );
@@ -123,14 +124,14 @@ function lexicon_block_configure($delta) {
       $form['lexicon_block']['output_settings']['link'] = array(
         '#type' => 'checkbox',
         '#title' => t('Show term name as link'),
-        '#default_value' => variable_get('lexicon_block_lexicon_random_term_link', TRUE),
+        '#default_value' => $config->get('lexicon_block_lexicon_random_term_link', TRUE),
         '#description' => t('If selected, this option causes the term name to be made a link to the lexicon entry.'),
       );
 
       $form['lexicon_block']['output_settings']['trim'] = array(
         '#type' => 'checkbox',
         '#title' => t('Trim term description'),
-        '#default_value' => variable_get('lexicon_block_lexicon_random_term_trim', FALSE),
+        '#default_value' => $config->get('lexicon_block_lexicon_random_term_trim', FALSE),
         '#description' => t('If selected, this option causes the term description to be trimmed to a maximum number of characters.'),
       );
 
@@ -149,21 +150,21 @@ function lexicon_block_configure($delta) {
         '#title' => t('Trim length'),
         '#size' => 4,
         '#maxlength' => 3,
-        '#default_value' => variable_get('lexicon_block_lexicon_random_term_trim_length', 100),
+        '#default_value' => $config->get('lexicon_block_lexicon_random_term_trim_length', 100),
         '#description' => t('Enter the number of characters the description is trimmed to (note: trimming is performed word-safe).'),
       );
 
       $form['lexicon_block']['output_settings']['trim_fs']['trim_ellipsis'] = array(
         '#type' => 'checkbox',
         '#title' => t('Show ellipsis') . ' (&hellip;)',
-        '#default_value' => variable_get('lexicon_block_lexicon_random_term_trim_ellipsis', TRUE),
+        '#default_value' => $config->get('lexicon_block_lexicon_random_term_trim_ellipsis', TRUE),
         '#description' => t('If selected, this option will append an ellipsis to the end of the trimmed description.'),
       );
 
       $form['lexicon_block']['output_settings']['read_more_link'] = array(
         '#type' => 'checkbox',
         '#title' => t('Append read more link'),
-        '#default_value' => variable_get('lexicon_block_lexicon_random_term_read_more_link', TRUE),
+        '#default_value' => $config->get('lexicon_block_lexicon_random_term_read_more_link', TRUE),
         '#description' => t('If selected, this option will append a read more link to the end of the description.'),
       );
 
@@ -182,7 +183,7 @@ function lexicon_block_configure($delta) {
         '#title' => t('Read more link text'),
         '#size' => 60,
         '#maxlength' => 60,
-        '#default_value' => variable_get('lexicon_block_lexicon_random_term_read_more_link_text', 'read more'),
+        '#default_value' => $config->get('lexicon_block_lexicon_random_term_read_more_link_text', 'read more'),
         '#description' => t('Enter the text of the read more link in English (you can use the Drupal translate interface to locallize the string).'),
       );
 
@@ -223,12 +224,12 @@ function lexicon_block_view($delta) {
 
   switch ($delta) {
     case 'lexicon_random_term':
-      $interval = variable_get('lexicon_block_lexicon_random_term_interval', 0) * variable_get('lexicon_block_lexicon_random_term_step', 0);
-      $last = variable_get('lexicon_block_lexicon_random_term_last_{$lang}', 0);
+      $interval = $config->get('lexicon_block_lexicon_random_term_interval', 0) * $config->get('lexicon_block_lexicon_random_term_step', 0);
+      $last = $config->get('lexicon_block_lexicon_random_term_last_{$lang}', 0);
       // Check if the configured interval time has expired.
       if ($last + $interval < REQUEST_TIME) {
         // Time to load a new term.
-        $vids = variable_get('lexicon_block_lexicon_random_term_vids', array());
+        $vids = $config->get('lexicon_block_lexicon_random_term_vids', array());
         // Get rid off any array items with value '0'.
         $vids = array_filter($vids);
 
@@ -261,7 +262,7 @@ function lexicon_block_view($delta) {
       }
       else {
         // Get the currently selected tid.
-        $tid = variable_get('lexicon_block_lexicon_random_term_tid_{$lang}', 0);
+        $tid = $config->get('lexicon_block_lexicon_random_term_tid_{$lang}', 0);
       }
 
       $term = taxonomy_term_load($tid);
@@ -269,25 +270,25 @@ function lexicon_block_view($delta) {
 
       // If the block is configured to trim the description adjust the
       // description.
-      $trim = variable_get('lexicon_block_lexicon_random_term_trim', FALSE);
+      $trim = $config->get('lexicon_block_lexicon_random_term_trim', FALSE);
       if ($trim) {
-        $trim_length = variable_get('lexicon_block_lexicon_random_term_trim_length', 100);
-        $trim_ellipsis = variable_get('lexicon_block_lexicon_random_term_trim_elipsis', TRUE);
+        $trim_length = $config->get('lexicon_block_lexicon_random_term_trim_length', 100);
+        $trim_ellipsis = $config->get('lexicon_block_lexicon_random_term_trim_elipsis', TRUE);
         $term->description = truncate_utf8($term->description, $trim_length, TRUE, $trim_ellipsis);
         $term->safe_description = truncate_utf8($term->safe_description, $trim_length, TRUE, $trim_ellipsis);
       }
 
       // If the block is configured to add a read more link to the description
       // add it to the description.
-      $read_more_link = variable_get('lexicon_block_lexicon_random_term_read_more_link', TRUE);
-      $read_more_link_text = variable_get('lexicon_block_lexicon_random_term_read_more_link_text', 'read more');
+      $read_more_link = $config->get('lexicon_block_lexicon_random_term_read_more_link', TRUE);
+      $read_more_link_text = $config->get('lexicon_block_lexicon_random_term_read_more_link_text', 'read more');
       if ($read_more_link) {
         $term->description = $term->description . ' ' . l(t($read_more_link_text), $term->link['path'], array('fragment' => $term->link['fragment']));
         $term->safe_description = $term->safe_description . ' ' . l(t($read_more_link_text), $term->link['path'], array('fragment' => $term->link['fragment']));
       }
 
       // If the block is configured not to link terms remove the link.
-      $link = variable_get('lexicon_block_lexicon_random_term_link', TRUE);
+      $link = $config->get('lexicon_block_lexicon_random_term_link', TRUE);
       if (!$link) {
         unset($term->link);
       }
@@ -306,15 +307,15 @@ function lexicon_block_view($delta) {
  */
 function lexicon_menu() {
   // Get all the id's of vocabularies that are configured in the settings.
-  $vids = variable_get('lexicon_vids', array());
+  $vids = $config->get('lexicon_vids', array());
 
   // Create a menu item for each vocabulary with the configured path and title.
   foreach ($vids as $vid) {
     // Don't create menu items for vocabularies that are not Lexicon
     // vocabularies.
     if ($vid != 0) {
-      $lexicon_path = variable_get('lexicon_path_' . $vid, 'lexicon/' . $vid);
-      $lexicon_title = variable_get('lexicon_title_' . $vid, t('Lexicon'));
+      $lexicon_path = $config->get('lexicon_path_' . $vid, 'lexicon/' . $vid);
+      $lexicon_title = $config->get('lexicon_title_' . $vid, t('Lexicon'));
       $items[$lexicon_path] = array(
         'title' => $lexicon_title,
         'page callback' => '_lexicon_page',
@@ -402,14 +403,14 @@ function lexicon_permission() {
  */
 function lexicon_theme($existing, $type, $theme, $path) {
   return array(
-    'lexicon_alphabar' => array(
-      'template' => 'templates/lexicon-alphabar',
-      'variables' => array(
-        'lexicon_alphabar' => NULL,
-      ),
-    ),
+    // 'lexicon_alphabar' => array(
+    //   'template' => 'templates/lexicon-alphabar',
+    //   'variables' => array(
+    //     'lexicon_alphabar' => NULL,
+    //   ),
+    // ),
     'lexicon_overview' => array(
-      'template' => 'templates/lexicon-overview',
+      'template' => 'lexicon-overview',
       'variables' => array(
         'lexicon_overview' => NULL,
         'lexicon_alphabar' => NULL,
@@ -417,30 +418,30 @@ function lexicon_theme($existing, $type, $theme, $path) {
       ),
     ),
     'lexicon_overview_section' => array(
-      'template' => 'templates/lexicon-overview-section',
+      'template' => 'lexicon-overview-section',
       'variables' => array(
         'lexicon_section' => NULL,
         'lexicon_overview_items' => NULL),
     ),
     'lexicon_overview_item' => array(
-      'template' => 'templates/lexicon-overview-item',
+      'template' => 'lexicon-overview-item',
       'variables' => array(
         'term' => NULL,
       ),
     ),
-    'lexicon_block_term' => array(
-      'template' => 'templates/lexicon-block-term',
-      'variables' => array(
-        'term' => NULL,
-      ),
-    ),
-    'lexicon_mark_term' => array(
-      'template' => 'templates/lexicon-mark-term',
-      'variables' => array(
-        'term' => NULL,
-        'text' => NULL,
-      ),
-    ),
+    // 'lexicon_block_term' => array(
+    //   'template' => 'templates/lexicon-block-term',
+    //   'variables' => array(
+    //     'term' => NULL,
+    //   ),
+    // ),
+    // 'lexicon_mark_term' => array(
+    //   'template' => 'templates/lexicon-mark-term',
+    //   'variables' => array(
+    //     'term' => NULL,
+    //     'text' => NULL,
+    //   ),
+    // ),
   );
 }
 
@@ -449,7 +450,7 @@ function lexicon_theme($existing, $type, $theme, $path) {
  */
 function lexicon_init() {
   // Check if marking of terms is enabled.
-  if (variable_get('lexicon_mark_terms', 0) == 1) {
+  if ($config->get('lexicon_mark_terms', 0) == 1) {
     $path = drupal_get_path('module', 'lexicon');
     // Load the lexicon.css on every page to minimally style marked terms.
     drupal_add_css($path . '/css/lexicon.css');
@@ -461,7 +462,7 @@ function lexicon_init() {
  */
 function lexicon_taxonomy_term_insert($term) {
   // Clear the filter cache so that the new term is marked in content.
- // _lexicon_clear_filter_cache($term->vid, FALSE);
+ // _lexicon_clear_filter_cache($term->id(), FALSE);
 }
 
 /**
@@ -469,7 +470,7 @@ function lexicon_taxonomy_term_insert($term) {
  */
 function lexicon_taxonomy_term_update($term) {
   // Clear the filter cache so that the new term is marked in content.
- // _lexicon_clear_filter_cache($term->vid, FALSE);
+ // _lexicon_clear_filter_cache($term->id(), FALSE);
 }
 
 /**
@@ -478,7 +479,7 @@ function lexicon_taxonomy_term_update($term) {
 function lexicon_form_user_profile_form_alter(&$form, &$form_state, $form_id) {
   // If Lexicon is configured so that users can indicate if they want to have
   // terms marked in the content, then add the checkbox to the form.
-  if (variable_get('lexicon_disable_indicator', FALSE)) {
+  if ($config->get('lexicon_disable_indicator', FALSE)) {
     $account = $form['#user'];
 
     $form['content_lexicon'] = array(
@@ -548,7 +549,7 @@ function lexicon_filter_info() {
  */
 function _filter_lexicon_tips($filter, $format, $long = FALSE) {
   $block_tags = array();
-  $blocking_tags_setting = variable_get('lexicon_blocking_tags', 'abbr acronym');
+  $blocking_tags_setting = $config->get('lexicon_blocking_tags', 'abbr acronym');
 
   if ($blocking_tags_setting != '') {
     $block_tags = explode(' ', $blocking_tags_setting);
@@ -558,13 +559,13 @@ function _filter_lexicon_tips($filter, $format, $long = FALSE) {
   $standard_blocks = array('a', 'code', 'pre');
   foreach ($standard_blocks as $tag) {
     if (!in_array($tag, $block_tags)) {
-      $block_tags[] = check_plain($tag);
+      $block_tags[] = Html::escape($tag);
     }
   }
 
   foreach ($block_tags as $key => $tag) {
     if ($tag[0] == '.') {
-      $block_tags[$key] = 'span class="' . check_plain(Drupal\Component\Utility\Unicode::substr($tag, 1)) . '"';
+      $block_tags[$key] = 'span class="' . Html::escape(Drupal\Component\Utility\Unicode::substr($tag, 1)) . '"';
     }
   }
 
@@ -584,7 +585,7 @@ function _filter_lexicon($text, $filter, $format) {
   // If the Lexicon is setup so that users can indicate if they want terms to be
   // marked and the current user has indicated that they do not want terms to be
   // marked then return the text as it is.
-  if (variable_get('lexicon_disable_indicator', FALSE)) {
+  if ($config->get('lexicon_disable_indicator', FALSE)) {
     if (isset($user->data['lexicon_disable_indicator'])) {
       if ($user->data['lexicon_disable_indicator'] == 1) {
         return $text;
@@ -599,12 +600,12 @@ function _filter_lexicon($text, $filter, $format) {
   }
 
   // If marking of terms is enabled then mark terms and synonyms.
-  if (variable_get('lexicon_mark_terms', 0) == 1) {
+  if ($config->get('lexicon_mark_terms', 0) == 1) {
     $text = ' ' . $text . ' ';
-    $replace_mode = variable_get('lexicon_replace', 'superscript');
-    $link_style = variable_get('lexicon_link', 'normal');
+    $replace_mode = $config->get('lexicon_replace', 'superscript');
+    $link_style = $config->get('lexicon_link', 'normal');
     $absolute_link = ($link_style == 'absolute');
-    $vids = variable_get('lexicon_vids', array());
+    $vids = $config->get('lexicon_vids', array());
     $terms = _lexicon_get_terms($vids);
     $terms_replace = array();
     $tip_list = array();
@@ -617,15 +618,15 @@ function _filter_lexicon($text, $filter, $format) {
             }
             $term_title = $term->safe_description;
             $fragment = NULL;
-            if (!empty($vids) && (variable_get('lexicon_click_option', 0) == 1)) {
+            if (!empty($vids) && ($config->get('lexicon_click_option', 0) == 1)) {
                 // If terms should not be marked if a term has no description continue with the next term.
-                if (!variable_get('lexicon_allow_no_description', FALSE) && empty($term_title)) {
+                if (!$config->get('lexicon_allow_no_description', FALSE) && empty($term_title)) {
                     continue;
                 }
-                if (variable_get('lexicon_page_per_letter', FALSE)) {
-                    $linkto = variable_get('lexicon_path_' . $term->vid, 'lexicon/' . $term->vid) . '/letter_' . Drupal\Component\Utility\Unicode::strtolower(Drupal\Component\Utility\Unicode::substr($term->name, 0, 1));
+                if ($config->get('lexicon_page_per_letter', FALSE)) {
+                    $linkto = $config->get('lexicon_path_' . $term->id(), 'lexicon/' . $term->id()) . '/letter_' . Drupal\Component\Utility\Unicode::strtolower(Drupal\Component\Utility\Unicode::substr($term->name, 0, 1));
                 } else {
-                    $linkto = variable_get('lexicon_path_' . $term->vid, 'lexicon/' . $term->vid);
+                    $linkto = $config->get('lexicon_path_' . $term->id(), 'lexicon/' . $term->id());
                 }
 
                 // Create a valid anchor id.
@@ -633,7 +634,7 @@ function _filter_lexicon($text, $filter, $format) {
             } else {
                 $linkto = 'taxonomy/term/' . $term->tid;
             }
-            $term_class = variable_get('lexicon_term_class', 'lexicon-term');
+            $term_class = $config->get('lexicon_term_class', 'lexicon-term');
 
             if ($replace_mode == 'template') {
                 // Set the information needed by the template.
@@ -651,9 +652,9 @@ function _filter_lexicon($text, $filter, $format) {
                     case 'superscript':
                         $ins_after = '<sup class="lexicon-indicator" title="' . $term_title . '">';
                         if ($link_style == 'none') {
-                            $ins_after .= variable_get('lexicon_superscript', 'i');
+                            $ins_after .= $config->get('lexicon_superscript', 'i');
                         } else {
-                            $ins_after .= l(variable_get('lexicon_superscript', 'i'), $linkto, array(
+                            $ins_after .= l($config->get('lexicon_superscript', 'i'), $linkto, array(
                                 'attributes' => array(
                                     'title' => $term_title,
                                     'class' => array(
@@ -669,10 +670,10 @@ function _filter_lexicon($text, $filter, $format) {
 
                     case 'abbr':
                         if ($link_style == 'none') {
-                            $ins_before .= '<span class="' . $term_class . '" title="' . check_plain($term_title) . '"><' . $replace_mode . ' title="' . check_plain($term_title) . '">';
+                            $ins_before .= '<span class="' . $term_class . '" title="' . Html::escape($term_title) . '"><' . $replace_mode . ' title="' . Html::escape($term_title) . '">';
                             $ins_after .= '</' . $replace_mode . '></span>';
                         } else {
-                            $ins_before .= '<' . $replace_mode . ' title="' . check_plain($term_title) . '"><a class="' . $term_class . '" href="' . url($linkto, array('fragment' => $fragment, 'absolute' => $absolute_link)) . '" title="' . check_plain($term_title) . '">';
+                            $ins_before .= '<' . $replace_mode . ' title="' . Html::escape($term_title) . '"><a class="' . $term_class . '" href="' . url($linkto, array('fragment' => $fragment, 'absolute' => $absolute_link)) . '" title="' . Html::escape($term_title) . '">';
                             $ins_after .= '</a></' . $replace_mode . '>';
                         }
                         break;
@@ -686,23 +687,23 @@ function _filter_lexicon($text, $filter, $format) {
                             $ins_before .= '<a class="' . $term_class . '" href="' . url($linkto, array('fragment' => $fragment, 'absolute' => $absolute_link)) . '">';
                             $ins_after .= '</' . $replace_mode . '></a>';
                         }
-                        $ins_before .= '<' . $replace_mode . ' title="' . check_plain($term_title) . '">';
+                        $ins_before .= '<' . $replace_mode . ' title="' . Html::escape($term_title) . '">';
                         break;
 
                     case 'iconterm':
                         // Icon format, plus term link.
-                        $img = '<img src="' . base_path() . variable_get('lexicon_icon', '/imgs/lexicon.gif') . "\" />";
+                        $img = '<img src="' . base_path() . $config->get('lexicon_icon', '/imgs/lexicon.gif') . "\" />";
                         if ($link_style == 'none') {
                             $ins_after .= $img;
                         } else {
-                            $ins_before .= '<a class="' . $term_class . '" href="' . url($linkto, array('fragment' => $fragment, 'absolute' => $absolute_link)) . '" title="' . check_plain($term_title) . '">';
+                            $ins_before .= '<a class="' . $term_class . '" href="' . url($linkto, array('fragment' => $fragment, 'absolute' => $absolute_link)) . '" title="' . Html::escape($term_title) . '">';
                             $ins_after = $img . '</a>';
                         }
                         break;
 
                     case 'icon':
                         // Icon format.
-                        $img = '<img src="' . base_path() . variable_get('lexicon_icon', '/imgs/lexicon.gif') . "\" />";
+                        $img = '<img src="' . base_path() . $config->get('lexicon_icon', '/imgs/lexicon.gif') . "\" />";
                         if ($link_style == 'none') {
                             $ins_after .= $img;
                         } else {
@@ -724,7 +725,7 @@ function _filter_lexicon($text, $filter, $format) {
                             $ins_before = '<span class="' . $term_class . '">';
                             $ins_after = '</span>';
                         } else {
-                            $ins_before = '<a class="' . $term_class . '" href="' . url($linkto, array('fragment' => $fragment, 'absolute' => $absolute_link)) . '" title="' . check_plain($term_title) . '">';
+                            $ins_before = '<a class="' . $term_class . '" href="' . url($linkto, array('fragment' => $fragment, 'absolute' => $absolute_link)) . '" title="' . Html::escape($term_title) . '">';
                             $ins_after = '</a>';
                         }
                         break;
@@ -875,7 +876,7 @@ function _lexicon_insertlink(&$text, &$terms_replace) {
           // the match setting.
           $matchlen = Drupal\Component\Utility\Unicode::strlen($match);
           $proper_match = FALSE;
-          switch (variable_get('lexicon_match', 'b')) {
+          switch ($config->get('lexicon_match', 'b')) {
             // Require word break left or right.
             case 'lr':
               $proper_match = (_lexicon_is_boundary(Drupal\Component\Utility\Unicode::substr($text, $offset - 1, 1)) || _lexicon_is_boundary(Drupal\Component\Utility\Unicode::substr($text, $offset + $matchlen, 1)));
@@ -1007,6 +1008,7 @@ function _lexicon_get_terms(&$vids) {
  * Lexicon function to add extra information to a term object.
  */
 function _lexicon_term_add_info(&$term, $filter = FALSE) {
+  $config = \Drupal::config('lexicon.settings');
   // Check if the info has already been set.
   if (!isset($term->info_added)) {
     global $base_url;
@@ -1015,22 +1017,22 @@ function _lexicon_term_add_info(&$term, $filter = FALSE) {
 
     static $click_option, $link_related, $image_field, $synonyms_field, $page_per_letter, $show_edit, $show_desc, $show_search, $edit_voc, $access_search;
     if (!isset($click_option)) {
-      $click_option = variable_get('lexicon_click_option', 0);
-      $link_related = variable_get('lexicon_link_related', TRUE);
-      $image_field = variable_get('lexicon_image_field_' . $term->vid, '');
-      $synonyms_field = variable_get("lexicon_synonyms_field_" . $term->vid, '');
-      $page_per_letter = variable_get('lexicon_page_per_letter', FALSE);
-      $show_edit = variable_get('lexicon_show_edit', TRUE);
-      $show_search = variable_get('lexicon_show_search', TRUE);
-      $edit_voc = user_access('edit terms in ' . $term->vid);
-      $access_search = user_access('search content');
+      $click_option = $config->get('lexicon_click_option', 0);
+      $link_related = $config->get('lexicon_link_related', TRUE);
+      $image_field = $config->get('lexicon_image_field_' . $term->id(), '');
+      $synonyms_field = $config->get("lexicon_synonyms_field_" . $term->id(), '');
+      $page_per_letter = $config->get('lexicon_page_per_letter', FALSE);
+      $show_edit = $config->get('lexicon_show_edit', TRUE);
+      $show_search = $config->get('lexicon_show_search', TRUE);
+      $edit_voc = \Drupal::currentUser()->hasPermission('edit terms in ' . $term->id());
+      $access_search = \Drupal::currentUser()->hasPermission('search content');
     }
 
     // Set the id for the term.
     $term->id = _lexicon_create_valid_id($term->name);
 
     // Set the safe values of the title and description to prevent XSS.
-    $term->safe_name = check_plain($term->name);
+    $term->safe_name = Html::escape($term->name);
     // If this function is called from the filter use "strip_tags" to prevent
     // an infinte loop due to recursive calls and remove all HTML to use the
     // description in the title attribute.
@@ -1047,8 +1049,8 @@ function _lexicon_term_add_info(&$term, $filter = FALSE) {
       $image_field_items = field_get_items('taxonomy_term', $term, $image_field);
       if (!empty($image_field_items)) {
         $term->image['uri'] = $image_field_items[0]['uri'];
-        $term->image['alt'] = check_plain($image_field_items[0]['alt']);
-        $term->image['title'] = check_plain($image_field_items[0]['title']);
+        $term->image['alt'] = Html::escape($image_field_items[0]['alt']);
+        $term->image['title'] = Html::escape($image_field_items[0]['title']);
       }
     }
 
@@ -1062,7 +1064,7 @@ function _lexicon_term_add_info(&$term, $filter = FALSE) {
       }
     }
 
-    $path = variable_get('lexicon_path_' . $term->vid, 'lexicon/' . $term->vid);
+    $path = $config->get('lexicon_path_' . $term->id(), 'lexicon/' . $term->id());
     // If the Lexicon is spread over seperate pages per letter the link must
     // lead to the appropriate page with the correct anchor.
     if ($page_per_letter) {
@@ -1078,8 +1080,8 @@ function _lexicon_term_add_info(&$term, $filter = FALSE) {
     // If there are related terms add the information of each related term.
     if ($relations = _lexicon_get_related_terms($term)) {
       foreach ($relations as $related) {
-        $term->related[$related->tid]['name'] = check_plain($related->name);
-        $related_path = variable_get('lexicon_path_' . $related->vid, 'lexicon/' . $related->vid);
+        $term->related[$related->tid]['name'] = Html::escape($related->name);
+        $related_path = $config->get('lexicon_path_' . $related->vid, 'lexicon/' . $related->vid);
         // If the related terms have to be linked add the link information.
         if ($link_related) {
           if ($click_option == 1) {
@@ -1136,7 +1138,7 @@ function _lexicon_get_synonyms($vid) {
   $synonyms = array();
   $tax_tree = taxonomy_get_tree($vid, 0, NULL, TRUE);
 
-  $synonyms_field = variable_get('lexicon_synonyms_field_' . $vid, '');
+  $synonyms_field = $config->get('lexicon_synonyms_field_' . $vid, '');
 
   if ($synonyms_field != '') {
     foreach ($tax_tree as $term) {
@@ -1164,7 +1166,7 @@ function _lexicon_get_synonyms($vid) {
  */
 function _lexicon_get_related_terms(&$term) {
   $related = array();
-  $related_term_field = variable_get('lexicon_related_terms_field_' . $term->vid, '');
+  $related_term_field = $config->get('lexicon_related_terms_field_' . $term->id(), '');
 
   if ($related_term_field != '') {
     $related_term_field_items = field_get_items('taxonomy_term', $term, $related_term_field);
@@ -1186,7 +1188,7 @@ function _lexicon_get_related_terms(&$term) {
  * letter setting.
  */
 function _lexicon_alphabar_instruction_default() {
-  if (variable_get('lexicon_page_per_letter', FALSE)) {
+  if ($config->get('lexicon_page_per_letter', FALSE)) {
     return t('Click one of the letters above to go to the page of all terms beginning with that letter.');
   }
   else {
@@ -1250,7 +1252,7 @@ function _lexicon_create_valid_id($name) {
 // function _lexicon_clear_filter_cache($vid = NULL, $force = FALSE) {
 //   // Only clear the filter cache if the vocabulary is used as a Lexicon or when
 //   // the clearing of the filter cache is forced (from the admin form submit).
-//   if (in_array($vid, $vids = variable_get('lexicon_vids', array())) || $force) {
+//   if (in_array($vid, $vids = $config->get('lexicon_vids', array())) || $force) {
 //     // We could throw less things away if we checked which filter formats
 //     // used the lexicon filter, and we only threw those away. In practice,
 //     // most if not all formats would use the lexicon filter, so we just

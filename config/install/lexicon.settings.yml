@@ -9,7 +9,7 @@ lexicon_click_option: '1'
 lexicon_show_edit: 1
 lexicon_show_search: 1
 lexicon_go_to_top_link: 0
-lexicon_go_to_top_link_fragment: ''
+lexicon_go_to_top_link_fragment: 'top'
 lexicon_local_links_scroll: 0
 lexicon_mark_terms: 1
 lexicon_match: b
