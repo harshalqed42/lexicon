@@ -7,6 +7,7 @@ use Drupal\filter\Plugin\FilterBase;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
+use Drupal\Component\Utility\Unicode;
 
 /**
  * @Filter(
@@ -70,12 +71,17 @@ class LexiconFilter extends FilterBase {
             if (!$config->get('lexicon_allow_no_description', FALSE) && empty($term_title)) {
               continue;
             }
+
             if ($config->get('lexicon_page_per_letter', FALSE)) {
-              $linkto = $config->get('lexicon_path_' . $term->id(), '/lexicon/' . $term->id()) . '/letter_' . drupal_strtolower(drupal_substr($term->name, 0, 1));
+              $linkto = $config->get('lexicon_path_' . $term->getVocabularyId(), '/lexicon/' . $term->getVocabularyId()) . '/letter_' . Unicode::strtolower(Unicode::substr($term->getName(), 0, 1));
+              // var_dump([$vids, $linkto, $term->id()]); die ("SSSSAAS");
             }
             else {
-              $linkto = $config->get('lexicon_path_' . $term->id(), '/lexicon/' . $term->id());
+              $linkto = $config->get('lexicon_path_' . $term->getVocabularyId(), '/lexicon/' . $term->getVocabularyId());
+              // var_dump([$vids, $linkto]); die ("SS");
             }
+
+
 
             // Create a valid anchor id.
             $fragment = _lexicon_create_valid_id($term->getName());
@@ -133,7 +139,7 @@ class LexiconFilter extends FilterBase {
                   $ins_before .= '<' . $replace_mode . ' title="' . SafeMarkup::checkPlain($term_title) . '"><a class="' . $term_class . '" href="' . $linkto . '#' .$fragment . '" title="' . SafeMarkup::checkPlain($term_title) . '">';
                   $ins_after .= '</a></' . $replace_mode . '>';
                 }
-                // var_dump("<pre>".$ins_before);die("DDDSSSS");
+                // var_dump([$linkto, $ins_before]);die("DDDSSSS");
                 break;
 
               case 'acronym':
@@ -208,10 +214,8 @@ class LexiconFilter extends FilterBase {
       }
       ;
       $text = _lexicon_insertlink($text, $terms_replace);
-      // var_dump($text); die("DDDDSS");
-      return new FilterProcessResult($text);
     }
-    return $text;
+    return new FilterProcessResult($text);
   }
 
   /**
