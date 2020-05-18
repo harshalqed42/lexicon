@@ -22,212 +22,196 @@ class LexiconFilter extends FilterBase {
    *
    */
   public function process($text, $langcode) {
+
+    $user = \Drupal::currentUser();
     $config = \Drupal::config('lexicon.settings');
-    $current_term = 0;
-    $term = \Drupal::routeMatch()->getParameter('taxonomy_term');
-    if (!empty($route_match)) {
-      $current_term = $term->id();
-    }
-    $text = ' ' . $text . ' ';
-    $replace_mode = 'superscript';
-    $link_style = 'normal';
-    $vids = $config->get('lexicon_vids');
-    $terms = $this->lexicon_get_terms($vids);
-    $terms_replace = [];
-    if (is_array($terms)) {
-      foreach ($terms as $term) {
-        // If the term is equal to $current_term than skip marking that term.
-        if ($current_term == $term->id()) {
-          continue;
-        }
-        $term_title = $term->getName();
-        $fragment = NULL;
-        if (!empty($vids) && ($config->get('lexicon_click_option', 0) == 1)) {
-          if (!empty($vids)) {
-            if (!$config->get('lexicon_allow_no_description', FALSE) && empty($term_title)) {
-              if (empty($term_title)) {
-                continue;
-              }
-              if ($config->get('lexicon_page_per_letter', FALSE)) {
-                if (FALSE) {
-                  $linkto = $config->get('lexicon_path_' . $term->vid, 'lexicon/' . $term->vid) . '/letter_' . drupal_strtolower(drupal_substr($term->name, 0, 1));
-                }
-                else {
-                  // . $term->vid;//variable_get('lexicon_path_' . $term->vid, 'lexicon/' . $term->vid);
-                  $linkto = '/lexicon/test1';
-                }
-                // Create a valid anchor id.
-                $fragment = $this->lexicon_create_valid_id($term->getName());
-              }
-              else {
-                $linkto = 'taxonomy/term/' . $term->id();
-              }
-              // variable_get('lexicon_term_class', 'lexicon-term');.
-              $term_class = 'lexicon-term';
-              if ($replace_mode == 'template') {
-                // Set the information needed by the template.
-                $terms_replace[] = [
-                  'term' => $term,
-                // $absolute_link,
-                  'absolute_link' => FALSE,
-                  'linkto' => $linkto,
-                  'fragment' => $fragment,
-                  'term_class' => $term_class,
-                ];
-              }
-              else {
-                $ins_before = $ins_after = NULL;
-                switch ($replace_mode) {
-                  case 'superscript':
-                    $ins_after = '<sup class="lexicon-indicator" title="' . $term_title . '">';
-                    if ($link_style == 'none') {
-                      // variable_get('lexicon_superscript', 'i');.
-                      $ins_after .= 'i';
-                    }
-                    else {
-                      $url = Url::fromUserInput($linkto, [
-                        'attributes' => [
-                          'title' => $term_title,
-                          'class' => [
-                            $term_class,
-                          ],
-                        ],
-                        'fragment' => $fragment,
-                        'absolute' => FALSE,
-                      ]);
-                      $ins_after .= Link::fromTextAndUrl(t('i'), $url)->toString();
-                      /***
-                           * l(variable_get('lexicon_superscript', 'i'), $linkto, array(
-                       * 'attributes' => array(
-                       * 'title' => $term_title,
-                       * 'class' => array(
-                       * $term_class,
-                       * ),
-                       * ),
-                       * 'fragment' => $fragment,
-                       * 'absolute' => $absolute_link,
-                       * ));
-                            **/
-                    }
-                    $ins_after .= '</sup>';
-                    break;
-
-                  case 'abbr':
-                    if ($link_style == 'none') {
-                      $ins_before .= '<span class="' . $term_class . '" title="' . check_plain($term_title) . '"><' . $replace_mode . ' title="' . check_plain($term_title) . '">';
-                      $ins_after .= '</' . $replace_mode . '></span>';
-                    }
-                    else {
-                      $url = Url::fromUserInput($linkto, [
-                        'attributes' => [
-                          'title' => $term_title,
-                          'class' => [
-                            $term_class,
-                          ],
-                        ],
-                        'fragment' => $fragment,
-                        'absolute' => FALSE,
-                      ]);
-                    }
-                    $ins_before .= '<' . $replace_mode . ' title="' . check_plain($term_title) . '"><a class="' . $term_class . '" href="' . $url->toString() . '" title="' . check_plain($term_title) . '">';
-                    $ins_after .= '</a></' . $replace_mode . '>';
-                    break;
-
-                  case 'acronym':
-                  case 'cite':
-                  case 'dfn':
-                    if ($link_style == 'none') {
-                      $ins_after .= '</' . $replace_mode . '>';
-                    }
-                    else {
-                      $url = Url::fromUserInput($linkto, [
-                        'fragment' => $fragment,
-                        'absolute' => FALSE,
-                      ]);
-
-                      $ins_before .= '<a class="' . $term_class . '" href="' . $url->toString() . '">';
-                      $ins_after .= '</' . $replace_mode . '></a>';
-                    }
-                    $ins_before .= '<' . $replace_mode . ' title="' . check_plain($term_title) . '">';
-                    break;
-
-                  case 'iconterm':
-                    // Icon format, plus term link.
-                    // $img = '<img src="' . base_path() . variable_get('lexicon_icon', '/imgs/lexicon.gif') . "\" />";.
-                    $img = '<img src="' . base_path() . '/imgs/lexicon.gif' . "\" />";
-
-                    if ($link_style == 'none') {
-                      $ins_after .= $img;
-                    }
-                    else {
-                      $url = Url::fromUserInput($linkto, [
-                        'fragment' => $fragment,
-                        'absolute' => FALSE,
-                      ]);
-                      $ins_before .= '<a class="' . $term_class . '" href="' . $url->toString() . '" title="' . check_plain($term_title) . '">';
-                      $ins_after = $img . '</a>';
-                    }
-                    break;
-
-                  case 'icon':
-                    // Icon format.
-                    // $img = '<img src="' . base_path() . variable_get('lexicon_icon', '/imgs/lexicon.gif') . "\" />";.
-                    $img = '<img src="' . base_path() . '/imgs/lexicon.gif' . "\" />";
-
-                    if ($link_style == 'none') {
-                      $ins_after .= $img;
-                    }
-                    else {
-                      $url = Url::fromUserInput($linkto, [
-                        'fragment' => $fragment,
-                        'absolute' => FALSE,
-                      ]);
-                      $ins_after = Url::fromUserInput($linkto, [
-                        'attributes' => [
-                          'title' => $term_title,
-                          'class' => [
-                            $term_class,
-                          ],
-                        ],
-                        'fragment' => $fragment,
-                        'absolute' => FALSE,
-                      ]);
-                    }
-                    break;
-
-                  case 'term':
-                    // Term format.
-                    if ($link_style == 'none') {
-                      $ins_before = '<span class="' . $term_class . '">';
-                      $ins_after = '</span>';
-                    }
-                    else {
-                      $url = Url::fromUserInput($linkto, [
-                        'fragment' => $fragment,
-                        'absolute' => FALSE,
-                      ]);
-                      $ins_before = '<a class="' . $term_class . '" href="' . $url->toString() . '" title="' . check_plain($term_title) . '">';
-                      $ins_after = '</a>';
-                    }
-                    break;
-
-                  default:
-                    break;
-                }
-                $terms_replace[] = [
-                  'term' => $term,
-                  'ins_before' => $ins_before,
-                  'ins_after' => $ins_after,
-                ];
-              }
-            }
-          }
+    // If the Lexicon is setup so that users can indicate if they want terms to be
+    // marked and the current user has indicated that they do not want terms to be
+    // marked then return the text as it is.
+    if ($config->get('lexicon_disable_indicator', FALSE)) {
+      if (isset($user->data['lexicon_disable_indicator'])) {
+        if ($user->data['lexicon_disable_indicator'] == 1) {
+          return $text;
         }
       }
     }
 
-    $new_text = _lexicon_insertlink($text, $terms_replace);
-    return new FilterProcessResult($new_text);
+    $current_term = 0;
+    // If the current page is a taxonomy term page then set $current_term.
+    // if (strcmp(arg(0), 'taxonomy') == 0 && strcmp(arg(1), 'term') == 0 && arg(2) > 0) {
+    //   $current_term = arg(2);
+    // }
+
+    // If marking of terms is enabled then mark terms and synonyms.
+    if ($config->get('lexicon_mark_terms', 0) == 1) {
+      $text = ' ' . $text . ' ';
+      $replace_mode = $config->get('lexicon_replace', 'superscript');
+      $link_style = $config->get('lexicon_link', 'normal');
+      $absolute_link = ($link_style == 'absolute');
+      $vids = $config->get('lexicon_vids', array());
+      $terms = _lexicon_get_terms($vids);
+      $terms_replace = array();
+      $tip_list = array();
+
+
+
+      if (is_array($terms)) {
+
+
+        foreach ($terms as $term) {
+          // If the term is equal to $current_term than skip marking that term.
+          if ($current_term == $term->id()) {
+            continue;
+          }
+          $term_title = $term->getName();
+          $fragment = NULL;
+          if (!empty($vids) && ($config->get('lexicon_click_option', 0) == 1)) {
+            // If terms should not be marked if a term has no description continue with the next term.
+            if (!$config->get('lexicon_allow_no_description', FALSE) && empty($term_title)) {
+              continue;
+            }
+            if ($config->get('lexicon_page_per_letter', FALSE)) {
+              $linkto = $config->get('lexicon_path_' . $term->id(), '/lexicon/' . $term->id()) . '/letter_' . drupal_strtolower(drupal_substr($term->name, 0, 1));
+            }
+            else {
+              $linkto = $config->get('lexicon_path_' . $term->id(), '/lexicon/' . $term->id());
+            }
+
+            // Create a valid anchor id.
+            $fragment = _lexicon_create_valid_id($term->getName());
+          }
+          else {
+            $linkto = '/taxonomy/term/' . $term->tid;
+          }
+
+          $term_class = $config->get('lexicon_term_class', 'lexicon-term');
+
+          if ($replace_mode == 'template') {
+            // Set the information needed by the template.
+            $terms_replace[] = array(
+              'term' => $term,
+              'absolute_link' => $absolute_link,
+              'linkto' => $linkto,
+              'fragment' => $fragment,
+              'term_class' => $term_class,
+            );
+            // var_dump(count($terms));die("DDD");
+          }
+          else {
+
+            $ins_before = $ins_after = NULL;
+
+            // Set the correct $ins_before and $ins_after to be used for marking.
+            switch ($replace_mode) {
+              case 'superscript':
+                $ins_after = '<sup class="lexicon-indicator" title="' . $term_title . '">';
+                if ($link_style == 'none') {
+                  $ins_after .= $config->get('lexicon_superscript', 'i');
+                }
+                else {
+                  $link = Link::fromTextAndUrl($config->get('lexicon_superscript', 'i'), Url::fromUserInput('/' .$linkto, [
+                    'fragment' => $fragment,
+                    'absolute' => $absolute_link,
+                  ]))->toRenderable();
+                  $link['#attributes'] = array(
+                    'title' => $term_title,
+                    'class' => array(
+                      $term_class,
+                    ),
+                  );
+                  $ins_after .= render($link);
+                }
+                $ins_after .= '</sup>';
+                break;
+
+              case 'abbr':
+                if ($link_style == 'none') {
+                  $ins_before .= '<span class="' . $term_class . '" title="' . SafeMarkup::checkPlain($term_title) . '"><' . $replace_mode . ' title="' . SafeMarkup::checkPlain($term_title) . '">';
+                  $ins_after .= '</' . $replace_mode . '></span>';
+                }
+                else {
+                  $ins_before .= '<' . $replace_mode . ' title="' . SafeMarkup::checkPlain($term_title) . '"><a class="' . $term_class . '" href="' . $linkto . '#' .$fragment . '" title="' . SafeMarkup::checkPlain($term_title) . '">';
+                  $ins_after .= '</a></' . $replace_mode . '>';
+                }
+                // var_dump("<pre>".$ins_before);die("DDDSSSS");
+                break;
+
+              case 'acronym':
+              case 'cite':
+              case 'dfn':
+                if ($link_style == 'none') {
+                  $ins_after .= '</' . $replace_mode . '>';
+                }
+                else {
+                  $ins_before .= '<a class="' . $term_class . '" href="' . $linkto . '#' .$fragment . '">';
+                  $ins_after .= '</' . $replace_mode . '></a>';
+                }
+                $ins_before .= '<' . $replace_mode . ' title="' . SafeMarkup::checkPlain($term_title) . '">';
+                break;
+
+              case 'iconterm':
+                // Icon format, plus term link.
+                $img = '<img src="' . base_path() . $config->get('lexicon_icon', '/imgs/lexicon.gif') . "\" />";
+                if ($link_style == 'none') {
+                  $ins_after .= $img;
+                }
+                else {
+                  $ins_before .= '<a class="' . $term_class . '" href="' . $linkto . '#' .$fragment . '" title="' . SafeMarkup::checkPlain($term_title) . '">';
+                  $ins_after = $img . '</a>';
+                }
+                break;
+
+              case 'icon':
+                // Icon format.
+                $img = '<img src="' . base_path() . $config->get('lexicon_icon', '/imgs/lexicon.gif') . "\" />";
+                if ($link_style == 'none') {
+                  $ins_after .= $img;
+                }
+                else {
+                  $ins_after = l($img, $linkto, array(
+                    'attributes' => array(
+                      'title' => $term_title,
+                      'class' => 'lexicon-icon',
+                    ),
+                    'fragment' => $fragment,
+                    'absolute' => $absolute_link,
+                    'html' => TRUE,
+                  ));
+                }
+                break;
+
+              case 'term':
+                // Term format.
+                if ($link_style == 'none') {
+                  $ins_before = '<span class="' . $term_class . '">';
+                  $ins_after = '</span>';
+                }
+                else {
+                  $ins_before = '<a class="' . $term_class . '" href="' . url($linkto, array('fragment' => $fragment, 'absolute' => $absolute_link)) . '" title="' . SafeMarkup::checkPlain($term_title) . '">';
+                  $ins_after = '</a>';
+                }
+                break;
+
+              default:
+                break;
+            }
+
+            $terms_replace[] = array(
+              'term' => $term,
+              'ins_before' => $ins_before,
+              'ins_after' => $ins_after,
+            );
+
+
+          }
+        }
+      }
+      ;
+      $text = _lexicon_insertlink($text, $terms_replace);
+      // var_dump($text); die("DDDDSS");
+      return new FilterProcessResult($text);
+    }
+    return $text;
   }
 
   /**
@@ -265,21 +249,21 @@ class LexiconFilter extends FilterBase {
       $destination = \Drupal::service('redirect.destination');
       static $click_option, $link_related, $image_field, $synonyms_field, $page_per_letter, $show_edit, $show_desc, $show_search, $edit_voc, $access_search;
       if (!isset($click_option)) {
-        // variable_get('lexicon_click_option', 0);.
+        // $config->get('lexicon_click_option', 0);.
         $click_option = 0;
-        // variable_get('lexicon_link_related', TRUE);.
+        // $config->get('lexicon_link_related', TRUE);.
         $link_related = TRUE;
-        // variable_get('lexicon_image_field_' . $term->vid, '');.
+        // $config->get('lexicon_image_field_' . $term->id(), '');.
         $image_field = '';
-        // variable_get("lexicon_synonyms_field_" . $term->vid, '');.
+        // $config->get("lexicon_synonyms_field_" . $term->id(), '');.
         $synonyms_field = '';
-        // variable_get('lexicon_page_per_letter', FALSE);.
+        // $config->get('lexicon_page_per_letter', FALSE);.
         $page_per_letter = FALSE;
-        // variable_get('lexicon_show_edit', TRUE);.
+        // $config->get('lexicon_show_edit', TRUE);.
         $show_edit = TRUE;
-        // variable_get('lexicon_show_search', TRUE);.
+        // $config->get('lexicon_show_search', TRUE);.
         $show_search = TRUE;
-        // user_access('edit terms in ' . $term->vid);.
+        // user_access('edit terms in ' . $term->id());.
         $edit_voc = TRUE;
         // user_access('search content');.
         $access_search = TRUE;
@@ -301,8 +285,8 @@ class LexiconFilter extends FilterBase {
         // $image_field_items = field_get_items('taxonomy_term', $term, $image_field);
         //                if (!empty($image_field_items)) {
         //                    $term->image['uri'] = $image_field_items[0]['uri'];
-        //                    $term->image['alt'] = check_plain($image_field_items[0]['alt']);
-        //                    $term->image['title'] = check_plain($image_field_items[0]['title']);
+        //                    $term->image['alt'] = SafeMarkup::checkPlain($image_field_items[0]['alt']);
+        //                    $term->image['title'] = SafeMarkup::checkPlain($image_field_items[0]['title']);
         //                }
       }
 
@@ -315,7 +299,7 @@ class LexiconFilter extends FilterBase {
         //                    }
         //                }
       }
-      // variable_get('lexicon_path_' . $term->vid, 'lexicon/' . $term->vid);.
+      // $config->get('lexicon_path_' . $term->id(), 'lexicon/' . $term->id());.
       $path = 'lexicon/test1';
       if ($page_per_letter) {
         // $term->link['path'] = $path . '/letter_' . drupal_strtolower(drupal_substr($term->name, 0, 1));
@@ -329,8 +313,8 @@ class LexiconFilter extends FilterBase {
       // If there are related terms add the information of each related term.
       //            if ($relations = _lexicon_get_related_terms($term)) {
       //                foreach ($relations as $related) {
-      //                    $term->related[$related->tid]['name'] = check_plain($related->name);
-      //                    $related_path = variable_get('lexicon_path_' . $related->vid, 'lexicon/' . $related->vid);
+      //                    $term->related[$related->tid]['name'] = SafeMarkup::checkPlain($related->name);
+      //                    $related_path = $config->get('lexicon_path_' . $related->vid, 'lexicon/' . $related->vid);
       //                    // If the related terms have to be linked add the link information.
       //                    if ($link_related) {
       //                        if ($click_option == 1) {

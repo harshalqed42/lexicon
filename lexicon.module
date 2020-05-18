@@ -756,6 +756,7 @@ function _filter_lexicon($text, $filter, $format) {
  * tags and matches, then those 'events' are sorted and handled one by one.
  */
 function _lexicon_insertlink(&$text, &$terms_replace) {
+
   $config = \Drupal::config('lexicon.settings');
   $multibyte_enabled = extension_loaded('mbstring');
   if ($multibyte_enabled) {
@@ -791,6 +792,7 @@ function _lexicon_insertlink(&$text, &$terms_replace) {
     }
   }
 
+
   $searchtext = $case_sensitive ? $text : Drupal\Component\Utility\Unicode::strtolower($text);
 
   foreach ($open_tags as $i => $tag) {
@@ -802,9 +804,11 @@ function _lexicon_insertlink(&$text, &$terms_replace) {
     }
   }
 
+
   // Find match candidates.
   foreach ($terms_replace as $i => $term) {
-    $name = $term['term']->name;
+    $name = $term['term']->getName();
+
     // Search for term name in content.
     if (!$case_sensitive) {
         $name = Drupal\Component\Utility\Unicode::strtolower($name);
@@ -863,6 +867,7 @@ function _lexicon_insertlink(&$text, &$terms_replace) {
       $offset += $len;
     }
 
+
     if (isset($term['term']->synonyms)) {
       foreach ($term['term']->synonyms as $synonym) {
         if (!$case_sensitive) {
@@ -870,6 +875,7 @@ function _lexicon_insertlink(&$text, &$terms_replace) {
         }
         $offset = 0;
         $first_match_found = FALSE;
+        // die("DDDHELiiooOs $name" );
         while (($offset = $findfunc($searchtext, $synonym, $offset)) !== FALSE) {
           $len = Drupal\Component\Utility\Unicode::strlen($synonym);
           $match = Drupal\Component\Utility\Unicode::substr($text, $offset, $len);
@@ -988,7 +994,7 @@ function _lexicon_get_terms(&$vids) {
   if (!$got) {
     foreach ($vids as $vid) {
       // Load the entire vocabulary with all entities.
-      $tree = taxonomy_get_tree($vid, 0, NULL, TRUE);
+      $tree = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree($vid, 0, NULL, TRUE);
       // Add extra information to each term in the tree.
       foreach ($tree as $term) {
         _lexicon_term_add_info($term, TRUE);
