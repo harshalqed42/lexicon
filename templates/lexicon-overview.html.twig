@@ -11,14 +11,17 @@
   {% endif %}
   {{ lexicon_alphabar }}
   <div class="lexicon-list">
-    here the lexicon list will show.. :) :)
     {% for section in lexicon_overview_sections %}
       {{ section }}
       {% if lexicon_overview.go_to_top_link %}
-        <!-- TODO GOTO TOP -->
+        <p>
+          {{ link(lexicon_overview.go_to_top_link["name"], '#', {
+              'fragement': lexicon_overview.go_to_top_link["fragment"],
+              'attributes': lexicon_overview.go_to_top_link["attributes"],
+              'external': true
+            }) }}
+        </p>
       {% endif %}
-    {% else %}
-
     {% endfor %}
   </div>
 </div>

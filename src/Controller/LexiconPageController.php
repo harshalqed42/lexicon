@@ -8,6 +8,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Url;
+use Drupal\Core\Link;
 
 /**
  * Controller for Lexicon pages.
@@ -126,6 +128,7 @@ class LexiconPageController extends ControllerBase {
  */
 function _lexicon_overview($vocab, $letter = NULL) {
   $config = \Drupal::config('lexicon.settings');
+
   $dest = drupal_get_destination();
 
   $vid = $vocab->id();
@@ -140,13 +143,13 @@ function _lexicon_overview($vocab, $letter = NULL) {
   $show_description = $config->get('lexicon_show_description', FALSE);
   $link_to_term_page = $config->get('lexicon_link_to_term_page', FALSE);
 
-  // If the Lexicon is configured to show one big list of terms, but there is a
+  // @todo: If the Lexicon is configured to show one big list of terms, but there is a
   // letter in the argument, return 404.
   if (!$page_per_letter && $letter) {
     return MENU_NOT_FOUND;
   }
 
-  // Set the title if the terms are displayed per letter instead of in one big
+  // @todo: Set the title if the terms are displayed per letter instead of in one big
   // list if the Lexicon is configured to be split into multiple pages and there
   // is a letter argument.
   if ($page_per_letter && $letter) {
@@ -158,8 +161,35 @@ function _lexicon_overview($vocab, $letter = NULL) {
 
   // Load the entire vocabulary with entities.
   $tree = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree($vid, 0, NULL, TRUE);
+  // foreach ($tree as $term) {
+  //   echo $term->getName() . ', ';
+  // }
+  // var_dump(count($tree)); die('ddd');
+  // --- move this function to  a better place.
+
+  // /**
+  //  * Sort callback function to sort vocabulary trees alphabetically on term name.
+  //  */
   // Since the tree might not be sorted alphabetically sort it.
-  uasort($tree, '_lexicon_tree_sort');
+  uasort($tree, function($a, $b) {
+    if (Unicode::strtolower($a->getName()) == Unicode::strtolower($b->getName())) {
+      return 0;
+    }
+    else {
+      if (Unicode::strtolower($a->getName()) < Unicode::strtolower($b->getName())) {
+        return -1;
+      }
+      else {
+        return 1;
+      }
+    }
+  });
+  // echo "<hr />";
+  // foreach ($tree as $term) {
+  //   echo $term->getName() . ', ';
+  // }
+  // var_dump(count($tree)); die('ddd');
+  // var_dump(count($tree)); die("DDD");
 
   $lexicon_alphabar = NULL;
   // If the overview is separated in sections per letter or the Lexicon is
@@ -168,7 +198,7 @@ function _lexicon_overview($vocab, $letter = NULL) {
     $lexicon_alphabar = _lexicon_alphabar($vid, $tree);
   }
 
-  $lexicon_overview_sections = array();
+  $lexicon_overview_sections = [];
   $lexicon_introduction = NULL;
 
   // Check if the Lexicon is spread over multiple pages per letter and if a
@@ -181,18 +211,22 @@ function _lexicon_overview($vocab, $letter = NULL) {
     }
   }
   if (!($page_per_letter && !$letter)) {
-    $lexicon_overview_items = '';
+    // var_dump($page_per_letter); var_dump($letter); die('ddd');
+    $lexicon_overview_items = [];
     $lexicon_section = new \stdClass();
     if ($tree) {
       $not_first = FALSE;
       // Build up the list by iterating through all terms within the vocabulary.
       foreach ($tree as $term) {
         // If terms should not be marked if a term has no description continue with the next term.
-        if (!$config->get('lexicon_allow_no_description', FALSE) && empty($term->description)) {
+        if (!$config->get('lexicon_allow_no_description', FALSE) && empty($term->getDescription())) {
           continue;
         }
         // If we're looking for a single letter, see if this is it.
-        $term->let = Unicode::strtolower(Unicode::substr($term->name, 0, 1));
+        $term->let = Unicode::strtolower(Unicode::substr($term->getName(), 0, 1));
+        // var_dump($term->let); die('dd');
+        // var_dump($term->let);
+        // var_dump($term->let); die('dsd');
         // If there is no letter argument or the first letter of the term equals
         // the letter argument process the term.
         if ((!$letter) || $term->let == $letter) {
@@ -201,9 +235,13 @@ function _lexicon_overview($vocab, $letter = NULL) {
             if ($not_first) {
               if ($separate) {
                 // Create the section output for the previous section.
-                $lexicon_overview_sections[] = theme('lexicon_overview_section', array('lexicon_section' => $lexicon_section, 'lexicon_overview_items' => $lexicon_overview_items));
+                $lexicon_overview_sections[] = [
+                  '#theme' => 'lexicon_overview_section',
+                  '#lexicon_section' => $lexicon_section,
+                  '#lexicon_overview_items' => $lexicon_overview_items,
+                ];
                 // Clear the items to fill with the items of the new section.
-                $lexicon_overview_items = '';
+                // $lexicon_overview_items = '';
               }
             }
             if ($separate) {
@@ -216,23 +254,23 @@ function _lexicon_overview($vocab, $letter = NULL) {
           }
           // Create the term output.
           // @TODO LATER.
-          // $term_output = _lexicon_term_add_info($term);
+          $term_output = _lexicon_term_add_info($term);
           // Unset the description if it should not be shown.
           if (!$show_description) {
             unset($term_output->description);
             unset($term_output->safe_description);
           }
           if ($link_to_term_page) {
-            $term_output->name = l($term_output->name, 'taxonomy/term/' . $term_output->tid);
-            $term_output->safe_name = l($term_output->safe_name, 'taxonomy/term/' . $term_output->tid);
+            $term_output->name = Link::fromTextAndUrl($term_output->getName(), Url::fromUserInput('/taxonomy/term/' . $term_output->id()));
+            $term_output->safe_name = Link::fromTextAndUrl($term_output->getName(), Url::fromUserInput('/taxonomy/term/' . $term_output->id()));
           }
           // var_dump($term_output); die("DDDD$term_output");
-          $lexicon_overview_items = [
+          $lexicon_overview_items[] = [
             '#theme' => 'lexicon_overview_item',
             '#term' => $term_output,
           ];
           // For future use
-          // $lexicon_overview_items .= drupal_render(taxonomy_term_view($term_output, 'lexicon'));
+          // $lexicon_overview_items = \Drupal::service('renderer')->render(taxonomy_term_view($term_output, 'lexicon'));
           $current_let = $term->let;
           $not_first = TRUE;
         }
@@ -242,7 +280,8 @@ function _lexicon_overview($vocab, $letter = NULL) {
       if (!$separate || $lexicon_overview_items == '') {
         $lexicon_section = NULL;
       }
-      // var_dump($lexicon_overview_items); die("DD$lexicon_overview_items");
+      // var_dump((array)($lexicon_overview_items)); die("DDD");
+      // var_dump($lexicon_section); die("DDD");
       // Create the last section output.
       $lexicon_overview_sections[] = [
         '#theme' => 'lexicon_overview_section',
@@ -267,20 +306,26 @@ function _lexicon_overview($vocab, $letter = NULL) {
   }
 
   // var_dump($lexicon_overview_sections); die('DDD');
+  // var_dump(count($lexicon_overview_sections)); die("DDD");
 
   $output = array(
-    // 'admin_links' => array(
-    //   '#prefix' => '<div class="lexicon-admin-links">',
-    //   '#links' => _lexicon_admin_links($vocab, $dest),
-    //   '#theme' => 'links',
-    //   '#suffix' => '</div>',
-    // ),
-    'overview' => array(
-      '#lexicon_overview' => $lexicon_overview,
-      '#lexicon_alphabar' => 'WOW', //$lexicon_alphabar,
-      '#lexicon_overview_sections' => $lexicon_overview_sections,
-      '#theme' => 'lexicon_overview',
+    'admin_links' => array(
+      '#theme' => 'links',
+      '#prefix' => '<div class="lexicon-admin-links">',
+      '#links' => _lexicon_admin_links($vocab, $dest),
+      '#suffix' => '</div>',
     ),
+    'overview' => array(
+      '#theme' => 'lexicon_overview',
+      '#lexicon_overview' => $lexicon_overview,
+      '#lexicon_alphabar' => '@todo: lexicon_alphabar', //$lexicon_alphabar,
+      '#lexicon_overview_sections' => $lexicon_overview_sections,
+    ),
+    '#cache' => [
+      'tags' => [
+        'config:lexicon.settings'
+      ],
+    ],
   );
 
   return $output;
@@ -311,7 +356,7 @@ function _lexicon_alphabar($vid, &$tree) {
     if (!$config->get('lexicon_allow_no_description', FALSE) && empty($term->description)) {
       continue;
     }
-    $term->let = Unicode::strtolower(Unicode::substr($term->name, 0, 1));
+    $term->let = Unicode::strtolower(Unicode::substr($term->getName(), 0, 1));
     // If the Lexicon is split up in seperate pages per letter the link must
     // refer to the appropriate page.
     if ($page_per_letter) {
@@ -354,11 +399,11 @@ function _lexicon_admin_links($vocabulary, $destination) {
   if (\Drupal::currentUser()->hasPermission('administer taxonomy')) {
     $links['lexicon_add_term'] = array(
       'title' => t('Add term'),
-      'href' => 'admin/structure/taxonomy/' . $vocabulary->machine_name . '/add/term',
+      'url' => Url::fromUserInput('/admin/structure/taxonomy/manage/' . $vocabulary->id() . '/add'),
     );
     $links['lexicon_edit'] = array(
-      'title' => t('Edit @name', array('@name' => Unicode::strtolower(Html::escape($vocabulary->getName())))),
-      'href' => 'admin/structure/taxonomy/' . $vocabulary->machine_name . '/edit',
+      'title' => t('Edit @name', array('@name' => Unicode::strtolower(Html::escape($vocabulary->id())))),
+      'url' => Url::fromUserInput('/admin/structure/taxonomy/manage/' . $vocabulary->id()),
       'query' => $destination,
     );
   }
@@ -366,7 +411,7 @@ function _lexicon_admin_links($vocabulary, $destination) {
   if (\Drupal::currentUser()->hasPermission('administer filters')) {
     $links['lexicon_admin'] = array(
       'title' => t('Lexicon settings'),
-      'href' => 'admin/config/system/lexicon',
+      'url' => Url::fromUserInput('/admin/config/system/lexicon'),
       'query' => $destination,
     );
   }
@@ -374,19 +419,4 @@ function _lexicon_admin_links($vocabulary, $destination) {
   return $links;
 }
 
-/**
- * Sort callback function to sort vocabulary trees alphabetically on term name.
- */
-function _lexicon_tree_sort($a, $b) {
-  if (Unicode::strtolower($a->name) == Unicode::strtolower($b->name)) {
-    return 0;
-  }
-  else {
-    if (Unicode::strtolower($a->name) < Unicode::strtolower($b->name)) {
-      return -1;
-    }
-    else {
-      return 1;
-    }
-  }
-}
+

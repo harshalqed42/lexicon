@@ -1,0 +1,5 @@
+lexicon.config:
+  title: 'Lexicon Settings'
+  description: 'Configure the Lexicon module settings.'
+  parent: system.admin_config_system
+  route_name: lexicon.config

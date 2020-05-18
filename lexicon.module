@@ -10,6 +10,7 @@
  * filtered by an input filter.
  */
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Url;
 
 /**
  * Implements hook_help().
@@ -624,13 +625,13 @@ function _filter_lexicon($text, $filter, $format) {
                     continue;
                 }
                 if ($config->get('lexicon_page_per_letter', FALSE)) {
-                    $linkto = $config->get('lexicon_path_' . $term->id(), 'lexicon/' . $term->id()) . '/letter_' . Drupal\Component\Utility\Unicode::strtolower(Drupal\Component\Utility\Unicode::substr($term->name, 0, 1));
+                    $linkto = $config->get('lexicon_path_' . $term->id(), 'lexicon/' . $term->id()) . '/letter_' . Drupal\Component\Utility\Unicode::strtolower(Drupal\Component\Utility\Unicode::substr($term->getName(), 0, 1));
                 } else {
                     $linkto = $config->get('lexicon_path_' . $term->id(), 'lexicon/' . $term->id());
                 }
 
                 // Create a valid anchor id.
-                $fragment = _lexicon_create_valid_id($term->name);
+                $fragment = _lexicon_create_valid_id($term->getName());
             } else {
                 $linkto = 'taxonomy/term/' . $term->tid;
             }
@@ -1029,18 +1030,18 @@ function _lexicon_term_add_info(&$term, $filter = FALSE) {
     }
 
     // Set the id for the term.
-    $term->id = _lexicon_create_valid_id($term->name);
+    $term->id = _lexicon_create_valid_id($term->getName());
 
     // Set the safe values of the title and description to prevent XSS.
-    $term->safe_name = Html::escape($term->name);
+    $term->safe_name = Html::escape($term->getName());
     // If this function is called from the filter use "strip_tags" to prevent
     // an infinte loop due to recursive calls and remove all HTML to use the
     // description in the title attribute.
     if ($filter) {
-      $term->safe_description = strip_tags($term->description);
+      $term->safe_description = strip_tags($term->getDescription());
     }
     else {
-      $term->safe_description = check_markup($term->description, $term->format);
+      $term->safe_description = check_markup($term->getDescription(), $term->format);
     }
 
     // If there is an image for the term add the image information to the $term
@@ -1068,14 +1069,14 @@ function _lexicon_term_add_info(&$term, $filter = FALSE) {
     // If the Lexicon is spread over seperate pages per letter the link must
     // lead to the appropriate page with the correct anchor.
     if ($page_per_letter) {
-      $term->link['path'] = $path . '/letter_' . Drupal\Component\Utility\Unicode::strtolower(Drupal\Component\Utility\Unicode::substr($term->name, 0, 1));
+      $term->link['path'] = $path . '/letter_' . Drupal\Component\Utility\Unicode::strtolower(Drupal\Component\Utility\Unicode::substr($term->getName(), 0, 1));
     }
     // If the Lexicon overview shows all letters on one page the link must lead
     // to the appropriate anchor.
     else {
       $term->link['path'] = $path;
     }
-    $term->link['fragment'] = _lexicon_create_valid_id($term->name);
+    $term->link['fragment'] = _lexicon_create_valid_id($term->getName());
 
     // If there are related terms add the information of each related term.
     if ($relations = _lexicon_get_related_terms($term)) {
@@ -1098,7 +1099,7 @@ function _lexicon_term_add_info(&$term, $filter = FALSE) {
           }
           else {
             // The link has to point to the page of the term itself.
-            $term->related[$related->tid]['link']['path'] = 'taxonomy/term/' . $related->tid;
+            $term->related[$related->tid]['link']['path'] = 'taxonomy/term/' . $related->id();
             $term->related[$related->tid]['link']['fragment'] = '';
           }
         }
@@ -1107,7 +1108,7 @@ function _lexicon_term_add_info(&$term, $filter = FALSE) {
 
     if ($show_edit && $edit_voc) {
       $term->extralinks['edit term']['name'] = t('edit term');
-      $term->extralinks['edit term']['path'] = 'taxonomy/term/' . $term->tid . '/edit';
+      $term->extralinks['edit term']['url'] = Url::fromUserInput('/taxonomy/term/' . $term->id() . '/edit');
       $term->extralinks['edit term']['attributes'] = array(
         'class' => 'lexicon-edit-term',
         'title' => t('edit this term and definition'),
@@ -1117,7 +1118,7 @@ function _lexicon_term_add_info(&$term, $filter = FALSE) {
 
     if ($show_search && $access_search) {
       $term->extralinks['search for term']['name'] = t('search for term');
-      $term->extralinks['search for term']['path'] = 'search/node/' . $term->name;
+      $term->extralinks['search for term']['url'] = Url::fromUserInput('/search/node/' . $term->getName());
       $term->extralinks['search for term']['attributes'] = array(
         'class' => 'lexicon-search-term',
         'title' => t('search for content using this term'),
@@ -1165,6 +1166,7 @@ function _lexicon_get_synonyms($vid) {
  *
  */
 function _lexicon_get_related_terms(&$term) {
+  $config = \Drupal::config('lexicon.settings');
   $related = array();
   $related_term_field = $config->get('lexicon_related_terms_field_' . $term->id(), '');
 
@@ -1266,7 +1268,6 @@ function _lexicon_create_valid_id($name) {
  * Function to clear the menu cache.
  */
 function _lexicon_clear_menu_cache() {
-  // menu_rebuild();
   \Drupal::service('router.builder')->rebuild();
-  drupal_set_message(t('The menu cache has been cleared. There may be a temporary performance degradation while it is rebuilt.'), FALSE);
+  \Drupal::messenger()->addMessage(t('The menu cache has been cleared. There may be a temporary performance degradation while it is rebuilt.'));
 }
