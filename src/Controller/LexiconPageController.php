@@ -77,13 +77,6 @@ class LexiconPageController extends ControllerBase {
 
     $path = drupal_get_path('module', 'lexicon');
 
-    // Add the JavaScript required for the scroll effect if enabled.
-    // if ($scroll_enabled == 1) {
-    //   drupal_add_js($path . '/js/jquery.scrollTo-min.js');
-    //   drupal_add_js($path . '/js/jquery.localscroll-min.js');
-    //   drupal_add_js($path . '/js/lexicon.js');
-    // }
-
     $vids = $config->get('lexicon_vids', array());
 
     // Get the vocabulary-id for the vocabulary which the page callback is called
@@ -326,6 +319,9 @@ function _lexicon_overview($vocab, $letter = NULL) {
       'tags' => [
         'config:lexicon.settings'
       ],
+    ],
+    '#attached' => [
+      'library' => ['lexicon/lexicon'],
     ],
   );
 
