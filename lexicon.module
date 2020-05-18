@@ -447,18 +447,6 @@ function lexicon_theme($existing, $type, $theme, $path) {
 }
 
 /**
- * Implements hook_init().
- */
-function lexicon_init() {
-  // Check if marking of terms is enabled.
-  if ($config->get('lexicon_mark_terms', 0) == 1) {
-    $path = drupal_get_path('module', 'lexicon');
-    // Load the lexicon.css on every page to minimally style marked terms.
-    drupal_add_css($path . '/css/lexicon.css');
-  }
-}
-
-/**
  * Implements hook_taxonomy_term_insert().
  */
 function lexicon_taxonomy_term_insert($term) {
