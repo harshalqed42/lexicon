@@ -9,19 +9,22 @@
     </span>
   {% endif %}
 </dt>
+
 {% if term.safe_description or term.synonyms or term.image or term.related %}
   <dd>
   {% if term.image %}
   <!-- @todo: fix image style: image_style_url('thumbnail', term.image["uri"]) -->
     <img src="{{ term.image["uri"] }}" alt="{{ term.image["alt"] }}" title="{{ term.image["title"] }}" />
   {% endif %}
+
   {% if term.safe_description %}
-    {{ term.safe_description }}
+    <!-- @todo: view output as rendered. need to fix this. -->
+    {{ term.safe_description|raw }}
   {% endif %}
 
   {% if term.related %}
   <p class="lexicon-related">
-    { t('See also') . ': ' }
+    {{ 'See also: '|t }}
     {% for related_term in term.related %}
       {% if related_term["link"] %}
         {{ link(related_term["name"], related_term["link"]["path"], {'fragment': related_term["link"]["fragment"]}) }}

@@ -241,7 +241,8 @@ function _lexicon_overview($vocab, $letter = NULL) {
                   '#lexicon_overview_items' => $lexicon_overview_items,
                 ];
                 // Clear the items to fill with the items of the new section.
-                // $lexicon_overview_items = '';
+                $lexicon_overview_items = [];
+                $lexicon_section = new \stdClass();
               }
             }
             if ($separate) {
@@ -363,13 +364,10 @@ function _lexicon_alphabar($vid, &$tree) {
     // If the Lexicon is split up in seperate pages per letter the link must
     // refer to the appropriate page.
     if ($page_per_letter) {
-      $letters[$term->let] = l($term->let, $path . '/letter_' . $term->let, array(
-        'attributes' => array(
-          'class' => array(
-            'lexicon-item',
-          ),
-        ),
-      ));
+      $letters[$term->let] = Link::fromTextAndUrl($term->let, Url::fromUserInput($path . '/letter_' . $term->let))->toRenderable();
+      $letters[$term->let]['#attributes'] = [
+        'class' => ['lexicon-item'],
+      ];
     }
     // If the Lexicon is displayed with all letters on one overview then the
     // link must refer to an anchor.
