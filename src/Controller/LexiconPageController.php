@@ -336,6 +336,7 @@ function _lexicon_overview($vocab, $letter = NULL) {
  * Lexicon overview page.
  */
 function _lexicon_alphabar($vid, &$tree) {
+  $config = \Drupal::config('lexicon.settings');
   $path = $config->get('lexicon_path_' . $vid, 'lexicon/' . $vid);
   $page_per_letter = $config->get('lexicon_page_per_letter', FALSE);
 
@@ -346,7 +347,9 @@ function _lexicon_alphabar($vid, &$tree) {
   else {
     // Create the array of characters to use for the alphabar.
     $lets = array_merge($config->get('lexicon_alphabet', range('a', 'z')), $config->get('lexicon_digits', range('0', '9')));
-    $letters = drupal_map_assoc($lets);
+    // var_dump($lets); var_dump($letters); die("DD");
+    // $letters = drupal_map_assoc($lets);
+    $letters = array_combine($lets, $lets);
   }
 
   // For each term in the vocabulary get the first letter and put it in the
@@ -371,7 +374,7 @@ function _lexicon_alphabar($vid, &$tree) {
     // If the Lexicon is displayed with all letters on one overview then the
     // link must refer to an anchor.
     else {
-      $letters[$term->let] = l($term->let, $path, array(
+      $letters[$term->let] = Link::fromTextAndUrl($term->let, Url::fromuserInput($path), array(
         'fragment' => 'letter_' . $term->let,
         'attributes' => array(
           'class' => array(
@@ -382,12 +385,15 @@ function _lexicon_alphabar($vid, &$tree) {
     }
   }
 
-  $lexicon_alphabar = new stdClass();
+  $lexicon_alphabar = new \stdClass();
   $lexicon_alphabar->separator = ' ' . $config->get('lexicon_alphabar_separator', '|') . ' ';
   $lexicon_alphabar->instructions = Html::escape($config->get('lexicon_alphabar_instruction', _lexicon_alphabar_instruction_default()));
   $lexicon_alphabar->letters = $letters;
 
-  return theme('lexicon_alphabar', array('lexicon_alphabar' => $lexicon_alphabar));
+  return [
+    '#theme' => 'lexicon_alphabar',
+    '#lexicon_alphabar' => $lexicon_alphabar,
+  ];
 }
 
 /**

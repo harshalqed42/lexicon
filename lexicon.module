@@ -1190,6 +1190,7 @@ function _lexicon_get_related_terms(&$term) {
  * letter setting.
  */
 function _lexicon_alphabar_instruction_default() {
+  $config = \Drupal::config('lexicon.settings');
   if ($config->get('lexicon_page_per_letter', FALSE)) {
     return t('Click one of the letters above to go to the page of all terms beginning with that letter.');
   }

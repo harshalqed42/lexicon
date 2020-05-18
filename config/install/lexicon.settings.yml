@@ -23,7 +23,7 @@ lexicon_link: normal
 lexicon_term_class: lexicon-term
 lexicon_disable_indicator: 0
 lexicon_clear_filter_cache_on_submit: 1
-alphabet:
+lexicon_alphabet:
   - a
   - b
   - c
@@ -50,7 +50,7 @@ alphabet:
   - x
   - 'y'
   - z
-digits:
+lexicon_digits:
   - '0'
   - '1'
   - '2'
@@ -61,6 +61,6 @@ digits:
   - '7'
   - '8'
   - '9'
-suppress_unused: 0
-alphabar_separator: '|'
-alphabar_instruction: 'Click one of the letters above to advance the page to terms beginning with that letter.'
+lexicon_suppress_unused: 0
+lexicon_alphabar_separator: '|'
+lexicon_alphabar_instruction: 'Click one of the letters above to advance the page to terms beginning with that letter.'

@@ -15,7 +15,7 @@
       {{ section }}
       {% if lexicon_overview.go_to_top_link %}
         <p>
-          {{ link(lexicon_overview.go_to_top_link["name"], '#', {
+          {{ link(lexicon_overview.go_to_top_link["name"], 'https://google.com/', {
               'fragement': lexicon_overview.go_to_top_link["fragment"],
               'attributes': lexicon_overview.go_to_top_link["attributes"],
               'external': true
