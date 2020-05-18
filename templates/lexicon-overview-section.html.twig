@@ -1,3 +1,20 @@
+{#
+/**
+ * @file
+ * Default theme implementation for displaying a section of terms in the Lexicon
+ * overview page.
+ *
+ * This template renders a section of Lexicon terms in the Lexicon overview
+ * page.
+ *
+ * Available variables:
+ * - lexicon_section: section object.
+ *    - lexicon_section.letter: The letter the section is for.
+ *    - lexicon_section.id: The id to be used as the anchor of the section.
+ * - lexicon_overview_items: Lexicon overview items as rendered by
+ *   lexicon-overview-item.html.twig
+ */
+#}
 {% if lexicon_section %}
   <a id="{{ lexicon_section.id }}"></a>
   <h2 class="lexicon-letter">{{ lexicon_section.letter }}</h2>
