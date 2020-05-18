@@ -374,14 +374,11 @@ function _lexicon_alphabar($vid, &$tree) {
     // If the Lexicon is displayed with all letters on one overview then the
     // link must refer to an anchor.
     else {
-      $letters[$term->let] = Link::fromTextAndUrl($term->let, Url::fromuserInput($path), array(
-        'fragment' => 'letter_' . $term->let,
-        'attributes' => array(
-          'class' => array(
-            'lexicon-item',
-          ),
-        ),
-      ))->toString();
+      $letters[$term->let] = Link::fromTextAndUrl($term->let, Url::fromUserInput($path, ['fragment' => 'letter_' . $term->let]))->toRenderable();;
+      $letters[$term->let]['#attributes'] = [
+        'class' => ['lexicon-item'],
+      ];
+      $letters[$term->let] = render($letters[$term->let]);
     }
   }
 
