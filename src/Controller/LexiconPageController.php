@@ -318,7 +318,7 @@ function _lexicon_overview($vocab, $letter = NULL) {
     'overview' => array(
       '#theme' => 'lexicon_overview',
       '#lexicon_overview' => $lexicon_overview,
-      '#lexicon_alphabar' => '@todo: lexicon_alphabar', //$lexicon_alphabar,
+      '#lexicon_alphabar' => $lexicon_alphabar,
       '#lexicon_overview_sections' => $lexicon_overview_sections,
     ),
     '#cache' => [
@@ -381,7 +381,7 @@ function _lexicon_alphabar($vid, &$tree) {
             'lexicon-item',
           ),
         ),
-      ));
+      ))->toString();
     }
   }
 

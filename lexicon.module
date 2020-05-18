@@ -404,12 +404,12 @@ function lexicon_permission() {
  */
 function lexicon_theme($existing, $type, $theme, $path) {
   return array(
-    // 'lexicon_alphabar' => array(
-    //   'template' => 'templates/lexicon-alphabar',
-    //   'variables' => array(
-    //     'lexicon_alphabar' => NULL,
-    //   ),
-    // ),
+    'lexicon_alphabar' => array(
+      'template' => 'lexicon-alphabar',
+      'variables' => array(
+        'lexicon_alphabar' => NULL,
+      ),
+    ),
     'lexicon_overview' => array(
       'template' => 'lexicon-overview',
       'variables' => array(
