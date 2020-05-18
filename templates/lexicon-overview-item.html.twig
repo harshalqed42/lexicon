@@ -1,0 +1,48 @@
+<dt>
+<a id="{{ term.id }}"></a>
+  {{ term.safe_name }}
+  {% if term.extralinks %}
+    <span class="lexicon-extralinks">
+    {% for link in term.extralinks %}
+      {{ link(link["name"], link["url"]) }}
+    {% endfor %}
+    </span>
+  {% endif %}
+</dt>
+
+{% if term.safe_description or term.synonyms or term.image or term.related %}
+  <dd>
+  {% if term.image %}
+  <!-- @todo: fix image style: image_style_url('thumbnail', term.image["uri"]) -->
+    <img src="{{ term.image["uri"] }}" alt="{{ term.image["alt"] }}" title="{{ term.image["title"] }}" />
+  {% endif %}
+
+  {% if term.safe_description %}
+    <!-- @todo: view output as rendered. need to fix this. -->
+    {{ term.safe_description|raw }}
+  {% endif %}
+
+  {% if term.related %}
+  <p class="lexicon-related">
+    {{ 'See also: '|t }}
+    {% for related_term in term.related %}
+      {% if related_term["link"] %}
+        {{ link(related_term["name"], related_term["link"]["path"], {'fragment': related_term["link"]["fragment"]}) }}
+      {% else %}
+        {{ related_term["name"] }}
+      {% endif %}
+    {% endfor %}
+  </p>
+  {% endif %}
+
+  {% if term.synonyms %}
+  <p class="lexicon-synonyms">
+    {{ 'Synonyms: '|t }}
+    {% for synonym in term.synonyms %}
+      {{ synonym }}
+    {% endfor %}
+  </p>
+  {% endif %}
+  </dd>
+{% endif %}
+

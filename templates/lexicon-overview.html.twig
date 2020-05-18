@@ -1,0 +1,27 @@
+<div id="{{ lexicon_overview.voc_name }}">
+  {% if lexicon_overview.description %}
+    <div class="lexicon-description">
+      {{ lexicon_overview.description }}
+    </div>
+  {% endif %}
+  {% if lexicon_overview.introduction %}
+    <div class="lexicon-introduction">
+      {{ lexicon_overview.introduction }}
+    </div>
+  {% endif %}
+  {{ lexicon_alphabar }}
+  <div class="lexicon-list">
+    {% for section in lexicon_overview_sections %}
+      {{ section }}
+      {% if lexicon_overview.go_to_top_link %}
+        <p>
+          {{ link(lexicon_overview.go_to_top_link["name"], 'https://google.com/', {
+              'fragement': lexicon_overview.go_to_top_link["fragment"],
+              'attributes': lexicon_overview.go_to_top_link["attributes"],
+              'external': true
+            }) }}
+        </p>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>

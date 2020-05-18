@@ -1,0 +1,13 @@
+{% if lexicon_section %}
+  <a id="{{ lexicon_section.id }}"></a>
+  <h2 class="lexicon-letter">{{ lexicon_section.letter }}</h2>
+{% endif %}
+{% if lexicon_overview_items %}
+  <dl>
+    {{ lexicon_overview_items }}
+  </dl>
+{% else %}
+  <p>
+    {{ 'There are no terms to display.' }}
+  </p>
+{% endif %}

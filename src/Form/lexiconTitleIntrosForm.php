@@ -127,16 +127,6 @@ class lexiconTitleIntrosForm extends ConfigFormBase {
       _lexicon_clear_menu_cache();
       // _lexicon_clear_filter_cache(NULL, TRUE);
     }
-
-    $this->configFactory->getEditable('lexicon.settings')
-    // Set the submitted configuration setting.
-      ->set('alphabet', explode(" ", $form_state->getValue('alphabet')))
-      ->set('digits', explode(" ", $form_state->getValue('digits')))
-      ->set('suppress_unused', $form_state->getValue('suppress_unused'))
-      ->set('alphabar_separator', $form_state->getValue('alphabar_separator'))
-      ->set('alphabar_instruction', $form_state->getValue('alphabar_instruction'))
-      ->save();
-
     parent::submitForm($form, $form_state);
   }
 

@@ -31,18 +31,18 @@ class lexiconAlphabetForm extends ConfigFormBase {
     $form = [];
     $config = $this->config('lexicon.settings');
 
-    $form['alphabet'] = [
+    $form['lexicon_alphabet'] = [
       '#type' => 'textarea',
       '#title' => t('Enter all the letters of your alphabet, in the correct order, and in lower case.'),
-      '#default_value' => implode(' ', $config->get('alphabet')),
+      '#default_value' => implode(' ', $config->get('lexicon_alphabet')),
       '#description' => t('Separate the letters by a blank.'),
       '#rows' => 1,
     ];
 
-    $form['digits'] = [
+    $form['lexicon_digits'] = [
       '#type' => 'textarea',
       '#title' => t('Enter all the digits of your alphabet, in the correct order.'),
-      '#default_value' => implode(' ', $config->get('digits')),
+      '#default_value' => implode(' ', $config->get('lexicon_digits')),
       '#description' => t("Separate the digits by a blank. If you don't want terms to start with digits, leave this blank."),
       '#rows' => 1,
     ];
@@ -50,7 +50,7 @@ class lexiconAlphabetForm extends ConfigFormBase {
     $form['suppress_unused'] = [
       '#type' => 'checkbox',
       '#title' => t('Suppress unused letters?'),
-      '#default_value' => $config->get('suppress_unused'),
+      '#default_value' => $config->get('lexicon_suppress_unused'),
       '#description' => t('This will cause unused letters to be omitted from the alphabar.'),
     ];
 
@@ -66,7 +66,7 @@ class lexiconAlphabetForm extends ConfigFormBase {
       '#type' => 'radios',
       '#options' => $ab_seps,
       '#title' => t('Alphabar separator'),
-      '#default_value' => $config->get('alphabar_separator'),
+      '#default_value' => $config->get('lexicon_alphabar_separator'),
       '#description' => t('This is the character that will separate the letters in the alphabar.'),
       '#prefix' => '<div class="lexicon_radios">',
       '#suffix' => '</div>',
@@ -75,7 +75,7 @@ class lexiconAlphabetForm extends ConfigFormBase {
     $form['alphabar_instruction'] = [
       '#type' => 'textarea',
       '#title' => t('Alphabar instruction'),
-      '#default_value' => $config->get('alphabar_instruction'),
+      '#default_value' => $config->get('lexicon_alphabar_instruction'),
       '#description' => t('This is the text that will appear immediately below the alphabar.'),
       '#rows' => 1,
     ];
@@ -90,11 +90,11 @@ class lexiconAlphabetForm extends ConfigFormBase {
     // Retrieve the configuration.
     $this->configFactory->getEditable('lexicon.settings')
     // Set the submitted configuration setting.
-      ->set('alphabet', explode(" ", $form_state->getValue('alphabet')))
-      ->set('digits', explode(" ", $form_state->getValue('digits')))
-      ->set('suppress_unused', $form_state->getValue('suppress_unused'))
-      ->set('alphabar_separator', $form_state->getValue('alphabar_separator'))
-      ->set('alphabar_instruction', $form_state->getValue('alphabar_instruction'))
+      ->set('lexicon_alphabet', explode(" ", $form_state->getValue('lexicon_alphabet')))
+      ->set('lexicon_digits', explode(" ", $form_state->getValue('lexicon_digits')))
+      ->set('lexicon_suppress_unused', $form_state->getValue('suppress_unused'))
+      ->set('lexicon_alphabar_separator', $form_state->getValue('alphabar_separator'))
+      ->set('lexicon_alphabar_instruction', $form_state->getValue('alphabar_instruction'))
       ->save();
 
     parent::submitForm($form, $form_state);
