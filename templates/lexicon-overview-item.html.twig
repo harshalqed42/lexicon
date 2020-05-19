@@ -1,3 +1,32 @@
+{#
+/**
+ * @file
+ * Default theme implementation for displaying a single Lexicon term in the
+ * Lexicon overview page.
+ *
+ * This template renders a single Lexicon term in the Lexicon overview page.
+ *
+ * Available variables:
+ * - term: term object.
+ *    - term.tid: the term id.
+ *    - term.id: the id to be used as the anchor name/fragment.
+ *    - term.name: the term name (as a link if the "link to term page"
+ *      setting was selected; use to prevent XSS vulnerability).
+ *    - term.safe_name: the sanitized term name (as a link if the "link to
+ *      term page" setting was selected; use to prevent XSS vulnerability).
+ *    - term.image: the term image (if any) as a named array containing
+ *      image["uri"], image["alt"] and image["title"].
+ *    - term.description: the term description (if any).
+ *    - term.safe_description: the sanitized term description (if any; use to
+ *      prevent XSS vulnerability).
+ *    - term.related: the related terms (if any) as an array containing
+ *      related terms as an array containing ["name"] and ["link"] as a named
+ *      array containing "path" and "fragment".
+ *    - term.synonyms: the term synonyms (if any) in an array.
+ *    - term.extralinks: the extralinks (if any) in an array containing
+ *      ["name"], ["path"] and ["attributes"] per element.
+ */
+#}
 <dt>
 <a id="{{ term.id }}"></a>
   {{ term.safe_name }}

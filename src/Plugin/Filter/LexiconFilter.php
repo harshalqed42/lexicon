@@ -78,16 +78,13 @@ class LexiconFilter extends FilterBase {
             }
             else {
               $linkto = $config->get('lexicon_path_' . $term->getVocabularyId(), '/lexicon/' . $term->getVocabularyId());
-              // var_dump([$vids, $linkto]); die ("SS");
             }
-
-
 
             // Create a valid anchor id.
             $fragment = _lexicon_create_valid_id($term->getName());
           }
           else {
-            $linkto = '/taxonomy/term/' . $term->tid;
+            $linkto = '/taxonomy/term/' . $term->id();
           }
 
           $term_class = $config->get('lexicon_term_class', 'lexicon-term');

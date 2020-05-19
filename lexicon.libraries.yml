@@ -1,0 +1,10 @@
+lexicon:
+  css:
+    component:
+      css/lexicon.css: {}
+  js:
+    js/jquery.scrollTo-min.js: {}
+    js/jquery.localscroll-min.js: {}
+    js/lexicon.js: {}
+  dependencies:
+    - core/jquery
