@@ -53,9 +53,9 @@ class lexiconTitleIntrosForm extends ConfigFormBase {
         $form['paths_and_titles_and_intros' . $vocabulary_name]['lexicon_path_' . $vocabulary_name] = [
           '#type' => 'textfield',
           '#title' => t('The path of the lexicon for this vocabulary'),
-          '#description' => t('Determines the path that is used for the lexicon page for this vocabulary. Default is: <em>%path</em>.', ['%path' => 'lexicon/' . $vocabulary_name]),
+          '#description' => t('Determines the path that is used for the lexicon page for this vocabulary. Default is: <em>%path</em>.', ['%path' => '/lexicon/' . $vocabulary_name]),
           '#required' => TRUE,
-          '#default_value' => ($config->get('lexicon_path_' . $vocabulary_name) ? $config->get('lexicon_path_' . $vocabulary_name) : 'lexicon/' . $vocabulary_name),
+          '#default_value' => ($config->get('lexicon_path_' . $vocabulary_name) ? $config->get('lexicon_path_' . $vocabulary_name) : '/lexicon/' . $vocabulary_name),
         ];
         $form['paths_and_titles_and_intros' . $vocabulary_name]['lexicon_title_' . $vocabulary_name] = [
           '#type' => 'textfield',
