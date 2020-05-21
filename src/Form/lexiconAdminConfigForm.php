@@ -264,7 +264,7 @@ class lexiconAdminConfigForm extends ConfigFormBase {
         ],
       ],
     ];
-    // TODO : Add links with description.
+
     $indicator_options = [
       'template' => t('Use the template file: @template_file.', [
         '@template_file' => '<em>lexicon-mark-term.tpl.php</em>',
@@ -277,13 +277,13 @@ class lexiconAdminConfigForm extends ConfigFormBase {
         '@type' => \Drupal::l('abbr', Url::fromUri('http://www.w3.org/TR/html401/struct/text.html#edef-ABBR')),
       ]),
       'acronym' => t('Use @type element', [
-        // '@type' => l(t('acronym'), 'http://www.w3.org/TR/html401/struct/text.html#edef-ACRONYM'),
+        '@type' => \Drupal::l(t('acronym'), Url::fromUri('http://www.w3.org/TR/html401/struct/text.html#edef-ACRONYM')),
         ]),
       'cite' => t('Use @type element', [
-        // '@type' => l(t('cite'), 'http://www.w3.org/TR/html401/struct/text.html#edef-CITE'),
+        '@type' => \Drupal::l(t('cite'), Url::fromUri('http://www.w3.org/TR/html401/struct/text.html#edef-CITE')),
         ]),
       'dfn' => t('Use @type element', [
-        // '@type' => l(t('dfn'), 'http://www.w3.org/TR/html401/struct/text.html#edef-DFN'),
+        '@type' => \Drupal::l(t('dfn'), Url::fromUri('http://www.w3.org/TR/html401/struct/text.html#edef-DFN')),
         ]),
     ];
 

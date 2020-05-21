@@ -34,7 +34,7 @@ class lexiconAlphabetForm extends ConfigFormBase {
     $form['lexicon_alphabet'] = [
       '#type' => 'textarea',
       '#title' => t('Enter all the letters of your alphabet, in the correct order, and in lower case.'),
-      '#default_value' => implode(' ', $config->get('lexicon_alphabet')),
+      '#default_value' => implode(' ', !empty($config->get('lexicon_alphabet')) ? $config->get('lexicon_alphabet') : range('a', 'z')),
       '#description' => t('Separate the letters by a blank.'),
       '#rows' => 1,
     ];
@@ -42,7 +42,7 @@ class lexiconAlphabetForm extends ConfigFormBase {
     $form['lexicon_digits'] = [
       '#type' => 'textarea',
       '#title' => t('Enter all the digits of your alphabet, in the correct order.'),
-      '#default_value' => implode(' ', $config->get('lexicon_digits')),
+      '#default_value' => implode(' ', !empty($config->get('lexicon_digits')) ? $config->get('lexicon_digits') : range(0, 9)),
       '#description' => t("Separate the digits by a blank. If you don't want terms to start with digits, leave this blank."),
       '#rows' => 1,
     ];
