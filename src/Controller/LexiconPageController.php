@@ -75,7 +75,7 @@ class LexiconPageController extends ControllerBase {
       }
     }
 
-    $voc = taxonomy_vocabulary_load($found_vid);
+    $voc = \Drupal\taxonomy\Entity\Vocabulary::load($found_vid);
     // Set the active menu to be "primary-links" to make the breadcrumb work.
     // By default the active menu would be "navigation", causing only
     // "Home" > $node->title to be shown.
@@ -116,8 +116,17 @@ class LexiconPageController extends ControllerBase {
       ]));
     }
 
-    // Load the entire vocabulary with entities.
+    $langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
     $tree = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree($vid, 0, NULL, TRUE);
+    // Switch to translated term switched to different language.
+    if ($langcode != \Drupal::languageManager()->getDefaultLanguage()->getId()) {
+      foreach ($tree as &$term) {
+        if ($term->hasTranslation($langcode)) {
+          $term = $term->getTranslation($langcode);
+        }
+      }
+      unset($term);
+    }
 
     // Since the tree might not be sorted alphabetically sort it.
     uasort($tree, function ($a, $b) {
@@ -168,9 +177,7 @@ class LexiconPageController extends ControllerBase {
           }
           // If we're looking for a single letter, see if this is it.
           $term->let = Unicode::strtolower(Unicode::substr($term->getName(), 0, 1));
-          // var_dump($term->let); die('dd');
-          // var_dump($term->let);
-          // var_dump($term->let); die('dsd');
+
           // If there is no letter argument or the first letter of the term equals
           // the letter argument process the term.
           if ((!$letter) || $term->let == $letter) {
@@ -198,7 +205,10 @@ class LexiconPageController extends ControllerBase {
               }
             }
             // Create the term output.
-            // @TODO LATER.
+            // This needs to be unset because it doesn't work with translations.
+            if (isset($term->info_added)) {
+              unset($term->info_added);
+            }
             $term_output = _lexicon_term_add_info($term);
             // Unset the description if it should not be shown.
             if (!$show_description) {
@@ -250,8 +260,6 @@ class LexiconPageController extends ControllerBase {
       ];
     }
 
-    // var_dump($lexicon_overview_sections); die('DDD');
-    // var_dump(count($lexicon_overview_sections)); die("DDD");.
     $output = [
       'admin_links' => [
         '#theme' => 'links',
@@ -268,6 +276,9 @@ class LexiconPageController extends ControllerBase {
       '#cache' => [
         'tags' => [
           'config:lexicon.settings',
+        ],
+        'contexts' => [
+          'languages',
         ],
       ],
       '#attached' => [
