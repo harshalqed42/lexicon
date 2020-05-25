@@ -10,7 +10,7 @@ use Drupal\Core\Form\FormStateInterface;
 /**
  * Configure lexicon admin configuration settings.
  */
-class reletedTermsForm extends ConfigFormBase {
+class ReletedTermsForm extends ConfigFormBase {
 
   /**
    * {@inheritdoc}

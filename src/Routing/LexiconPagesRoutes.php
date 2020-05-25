@@ -4,7 +4,6 @@ namespace Drupal\lexicon\Routing;
 
 use Symfony\Component\Routing\Route;
 
-
 /**
  * Lexicon dynamic routes.
  */

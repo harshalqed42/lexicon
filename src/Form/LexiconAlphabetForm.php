@@ -8,7 +8,7 @@ use Drupal\Core\Form\FormStateInterface;
 /**
  * Configure lexicon admin configuration settings.
  */
-class lexiconAlphabetForm extends ConfigFormBase {
+class LexiconAlphabetForm extends ConfigFormBase {
 
   /**
    * {@inheritdoc}

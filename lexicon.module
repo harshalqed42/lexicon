@@ -68,7 +68,7 @@ function lexicon_block_configure($delta) {
         // vocabulary that is used as a Lexicon.
         if ($vid != 0) {
           // Put the vocabulary in the options array.
-          $voc = taxonomy_vocabulary_load($vid);
+          $voc = \Drupal\taxonomy\Entity\Vocabulary::load($vid);
           $vids[$vid] = Html::escape($voc->name);
         }
       }
@@ -304,86 +304,6 @@ function lexicon_block_view($delta) {
 }
 
 /**
- * Implements hook_menu().
- */
-function lexicon_menu() {
-  // Get all the id's of vocabularies that are configured in the settings.
-  $vids = $config->get('lexicon_vids', array());
-
-  // Create a menu item for each vocabulary with the configured path and title.
-  foreach ($vids as $vid) {
-    // Don't create menu items for vocabularies that are not Lexicon
-    // vocabularies.
-    if ($vid != 0) {
-      $lexicon_path = $config->get('lexicon_path_' . $vid, 'lexicon/' . $vid);
-      $lexicon_title = $config->get('lexicon_title_' . $vid, t('Lexicon'));
-      $items[$lexicon_path] = array(
-        'title' => $lexicon_title,
-        'page callback' => '_lexicon_page',
-        'access arguments' => array('access lexicon'),
-        'type' => MENU_SUGGESTED_ITEM,
-        'file' => 'lexicon.pages.inc',
-      );
-    }
-  }
-
-  $items['admin/config/system/lexicon'] = array(
-    'title' => 'Lexicon Settings',
-    'page callback' => 'lexicon_settings_page',
-    'description' => 'Configure the Lexicon module settings.',
-    'access arguments' => array('administer lexicon'),
-    'type' => MENU_NORMAL_ITEM,
-    'file' => 'lexicon.admin.inc',
-  );
-
-  $items['admin/config/system/lexicon/general'] = array(
-    'title' => 'General',
-    'description' => 'General settings',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('lexicon_general_settings_form'),
-    'access arguments' => array('administer lexicon'),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -5,
-    'file' => 'lexicon.admin.inc',
-  );
-
-  $items['admin/config/system/lexicon/paths_and_titles_and_intros'] = array(
-    'title' => 'Paths, titles, and intros settings',
-    'description' => 'Paths, titles, and intros settings',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('lexicon_paths_and_titles_and_intros_form'),
-    'access arguments' => array('administer lexicon'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 0,
-    'file' => 'lexicon.admin.inc',
-  );
-
-  $items['admin/config/system/lexicon/related_terms_synonyms_and_image'] = array(
-    'title' => 'Related terms, synonyms, and image settings',
-    'description' => 'Related terms, synonyms, and image settings',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('lexicon_related_terms_and_synonyms_and_image_form'),
-    'access arguments' => array('administer lexicon'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 0,
-    'file' => 'lexicon.admin.inc',
-  );
-
-  $items['admin/config/system/lexicon/alphabet'] = array(
-    'title' => 'Alphabar settings',
-    'description' => 'Alphabar settings.',
-    'access arguments' => array('administer lexicon'),
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('lexicon_alphabet_form'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => -3,
-    'file' => 'lexicon.admin.inc',
-  );
-
-  return $items;
-}
-
-/**
  * Implements hook_permission().
  */
 function lexicon_permission() {
@@ -490,13 +410,15 @@ function lexicon_form_user_profile_form_alter(&$form, &$form_state, $form_id) {
 
 /**
  * Implements hook_user_presave().
+ *
+ * @todo : Too few arguments to function lexicon_user_presave(),
  */
-function lexicon_user_presave(&$edit, $account, $category) {
-  // Save the indicator setting when the user profile edit form is submitted.
-  if (isset($edit['lexicon_disable_indicator'])) {
-    $edit['data']['lexicon_disable_indicator'] = $edit['lexicon_disable_indicator'];
-  }
-}
+// function lexicon_user_presave(&$edit, $account, $category) {
+//   // Save the indicator setting when the user profile edit form is submitted.
+//   if (isset($edit['lexicon_disable_indicator'])) {
+//     $edit['data']['lexicon_disable_indicator'] = $edit['lexicon_disable_indicator'];
+//   }
+// }
 
 /**
  * Implements hook_filter_info().
@@ -812,6 +734,17 @@ function _lexicon_get_terms(&$vids) {
     foreach ($vids as $vid) {
       // Load the entire vocabulary with all entities.
       $tree = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree($vid, 0, NULL, TRUE);
+      // Add translated terms.
+      $languages = \Drupal::languageManager()->getLanguages();
+      $languages = array_keys($languages);
+      $languages = array_diff($languages, [\Drupal::languageManager()->getDefaultLanguage()->getId()]);
+      foreach ($languages as $langcode) {
+        foreach ($tree as $term) {
+          if ($term->hasTranslation($langcode)) {
+            $tree[] = $term->getTranslation($langcode);
+          }
+        }
+      }
       // Add extra information to each term in the tree.
       foreach ($tree as $term) {
         _lexicon_term_add_info($term, TRUE);
@@ -835,7 +768,6 @@ function _lexicon_term_add_info(&$term, $filter = FALSE) {
   $config = \Drupal::config('lexicon.settings');
   // Check if the info has already been set.
   if (!isset($term->info_added)) {
-    global $base_url;
 
     $destination = drupal_get_destination();
 
@@ -888,7 +820,7 @@ function _lexicon_term_add_info(&$term, $filter = FALSE) {
       }
     }
 
-    $path = $config->get('lexicon_path_' . $term->id(), 'lexicon/' . $term->id());
+    $path = $config->get('lexicon_path_' . $term->id(), '/lexicon/' . $term->id());
     // If the Lexicon is spread over seperate pages per letter the link must
     // lead to the appropriate page with the correct anchor.
     if ($page_per_letter) {
