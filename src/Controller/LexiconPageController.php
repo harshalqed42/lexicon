@@ -2,6 +2,7 @@
 
 namespace Drupal\lexicon\Controller;
 
+use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\CronInterface;
@@ -75,7 +76,7 @@ class LexiconPageController extends ControllerBase {
       }
     }
 
-    $voc = \Drupal\taxonomy\Entity\Vocabulary::load($found_vid);
+    $voc = Vocabulary::load($found_vid);
     // Set the active menu to be "primary-links" to make the breadcrumb work.
     // By default the active menu would be "navigation", causing only
     // "Home" > $node->title to be shown.

@@ -10,7 +10,7 @@ use Drupal\Core\Url;
 /**
  * Configure lexicon admin configuration settings.
  */
-class lexiconAdminConfigForm extends ConfigFormBase {
+class LexiconAdminConfigForm extends ConfigFormBase {
 
   /**
    * {@inheritdoc}
@@ -278,13 +278,13 @@ class lexiconAdminConfigForm extends ConfigFormBase {
       ]),
       'acronym' => t('Use @type element', [
         '@type' => \Drupal::l(t('acronym'), Url::fromUri('http://www.w3.org/TR/html401/struct/text.html#edef-ACRONYM')),
-        ]),
+      ]),
       'cite' => t('Use @type element', [
         '@type' => \Drupal::l(t('cite'), Url::fromUri('http://www.w3.org/TR/html401/struct/text.html#edef-CITE')),
-        ]),
+      ]),
       'dfn' => t('Use @type element', [
         '@type' => \Drupal::l(t('dfn'), Url::fromUri('http://www.w3.org/TR/html401/struct/text.html#edef-DFN')),
-        ]),
+      ]),
     ];
 
     $form['mark_terms']['indicator']['lexicon_replace'] = [

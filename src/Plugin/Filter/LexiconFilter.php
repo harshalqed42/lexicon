@@ -41,23 +41,19 @@ class LexiconFilter extends FilterBase {
     // If the current page is a taxonomy term page then set $current_term.
     // if (strcmp(arg(0), 'taxonomy') == 0 && strcmp(arg(1), 'term') == 0 && arg(2) > 0) {
     //   $current_term = arg(2);
-    // }
-
+    // }.
     // If marking of terms is enabled then mark terms and synonyms.
     if ($config->get('lexicon_mark_terms', 0) == 1) {
       $text = ' ' . $text . ' ';
       $replace_mode = $config->get('lexicon_replace', 'superscript');
       $link_style = $config->get('lexicon_link', 'normal');
       $absolute_link = ($link_style == 'absolute');
-      $vids = $config->get('lexicon_vids', array());
+      $vids = $config->get('lexicon_vids', []);
       $terms = _lexicon_get_terms($vids);
-      $terms_replace = array();
-      $tip_list = array();
-
-
+      $terms_replace = [];
+      $tip_list = [];
 
       if (is_array($terms)) {
-
 
         foreach ($terms as $term) {
           // If the term is equal to $current_term than skip marking that term.
@@ -80,7 +76,7 @@ class LexiconFilter extends FilterBase {
 
             if ($config->get('lexicon_page_per_letter', FALSE)) {
               $linkto = $langprefix . $config->get('lexicon_path_' . $term->getVocabularyId(), '/lexicon/' . $term->getVocabularyId()) . '/letter_' . Unicode::strtolower(Unicode::substr($term->getName(), 0, 1));
-              // var_dump([$vids, $linkto, $term->id()]); die ("SSSSAAS");
+              // var_dump([$vids, $linkto, $term->id()]); die ("SSSSAAS");.
             }
             else {
               $linkto = $langprefix . $config->get('lexicon_path_' . $term->getVocabularyId(), '/lexicon/' . $term->getVocabularyId());
@@ -97,13 +93,13 @@ class LexiconFilter extends FilterBase {
 
           if ($replace_mode == 'template') {
             // Set the information needed by the template.
-            $terms_replace[] = array(
+            $terms_replace[] = [
               'term' => $term,
               'absolute_link' => $absolute_link,
               'linkto' => $linkto,
               'fragment' => $fragment,
               'term_class' => $term_class,
-            );
+            ];
             // var_dump(count($terms));die("DDD");
           }
           else {
@@ -118,16 +114,16 @@ class LexiconFilter extends FilterBase {
                   $ins_after .= $config->get('lexicon_superscript', 'i');
                 }
                 else {
-                  $link = Link::fromTextAndUrl($config->get('lexicon_superscript', 'i'), Url::fromUserInput('/' .$linkto, [
+                  $link = Link::fromTextAndUrl($config->get('lexicon_superscript', 'i'), Url::fromUserInput('/' . $linkto, [
                     'fragment' => $fragment,
                     'absolute' => $absolute_link,
                   ]))->toRenderable();
-                  $link['#attributes'] = array(
+                  $link['#attributes'] = [
                     'title' => $term_title,
-                    'class' => array(
+                    'class' => [
                       $term_class,
-                    ),
-                  );
+                    ],
+                  ];
                   $ins_after .= render($link);
                 }
                 $ins_after .= '</sup>';
@@ -139,10 +135,10 @@ class LexiconFilter extends FilterBase {
                   $ins_after .= '</' . $replace_mode . '></span>';
                 }
                 else {
-                  $ins_before .= '<' . $replace_mode . ' title="' . SafeMarkup::checkPlain($term_title) . '"><a class="' . $term_class . '" href="' . $linkto . '#' .$fragment . '" title="' . SafeMarkup::checkPlain($term_title) . '">';
+                  $ins_before .= '<' . $replace_mode . ' title="' . SafeMarkup::checkPlain($term_title) . '"><a class="' . $term_class . '" href="' . $linkto . '#' . $fragment . '" title="' . SafeMarkup::checkPlain($term_title) . '">';
                   $ins_after .= '</a></' . $replace_mode . '>';
                 }
-                // var_dump([$linkto, $ins_before]);die("DDDSSSS");
+                // var_dump([$linkto, $ins_before]);die("DDDSSSS");.
                 break;
 
               case 'acronym':
@@ -152,7 +148,7 @@ class LexiconFilter extends FilterBase {
                   $ins_after .= '</' . $replace_mode . '>';
                 }
                 else {
-                  $ins_before .= '<a class="' . $term_class . '" href="' . $linkto . '#' .$fragment . '">';
+                  $ins_before .= '<a class="' . $term_class . '" href="' . $linkto . '#' . $fragment . '">';
                   $ins_after .= '</' . $replace_mode . '></a>';
                 }
                 $ins_before .= '<' . $replace_mode . ' title="' . SafeMarkup::checkPlain($term_title) . '">';
@@ -165,7 +161,7 @@ class LexiconFilter extends FilterBase {
                   $ins_after .= $img;
                 }
                 else {
-                  $ins_before .= '<a class="' . $term_class . '" href="' . $linkto . '#' .$fragment . '" title="' . SafeMarkup::checkPlain($term_title) . '">';
+                  $ins_before .= '<a class="' . $term_class . '" href="' . $linkto . '#' . $fragment . '" title="' . SafeMarkup::checkPlain($term_title) . '">';
                   $ins_after = $img . '</a>';
                 }
                 break;
@@ -177,15 +173,15 @@ class LexiconFilter extends FilterBase {
                   $ins_after .= $img;
                 }
                 else {
-                  $ins_after = l($img, $linkto, array(
-                    'attributes' => array(
+                  $ins_after = l($img, $linkto, [
+                    'attributes' => [
                       'title' => $term_title,
                       'class' => 'lexicon-icon',
-                    ),
+                    ],
                     'fragment' => $fragment,
                     'absolute' => $absolute_link,
                     'html' => TRUE,
-                  ));
+                  ]);
                 }
                 break;
 
@@ -196,7 +192,7 @@ class LexiconFilter extends FilterBase {
                   $ins_after = '</span>';
                 }
                 else {
-                  $ins_before = '<a class="' . $term_class . '" href="' . url($linkto, array('fragment' => $fragment, 'absolute' => $absolute_link)) . '" title="' . SafeMarkup::checkPlain($term_title) . '">';
+                  $ins_before = '<a class="' . $term_class . '" href="' . url($linkto, ['fragment' => $fragment, 'absolute' => $absolute_link]) . '" title="' . SafeMarkup::checkPlain($term_title) . '">';
                   $ins_after = '</a>';
                 }
                 break;
@@ -205,17 +201,15 @@ class LexiconFilter extends FilterBase {
                 break;
             }
 
-            $terms_replace[] = array(
+            $terms_replace[] = [
               'term' => $term,
               'ins_before' => $ins_before,
               'ins_after' => $ins_after,
-            );
-
+            ];
 
           }
         }
-      }
-      ;
+      };
       $text = _lexicon_insertlink($text, $terms_replace);
     }
     return new FilterProcessResult($text);
