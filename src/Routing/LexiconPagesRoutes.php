@@ -25,7 +25,7 @@ class LexiconPagesRoutes {
         ],
         [
           '_permission' => 'access content',
-        ],
+        ]
       );
     }
     return $routes;
