@@ -5,61 +5,104 @@ namespace Drupal\lexicon\Controller;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\CronInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Url;
 use Drupal\Core\Link;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Controller for Lexicon pages.
  */
 class LexiconPageController extends ControllerBase {
+  use StringTranslationTrait;
 
   /**
-   * The cron service.
+   * The configuration object.
    *
-   * @var \Drupal\Core\CronInterface
+   * @var \Drupal\Core\Config\ImmutableConfig
    */
-  protected $cron;
+  protected $configFactory;
+
+  /**
+   * Returns current path.
+   *
+   * @var \Drupal\Core\Path\CurrentPathStack
+   */
+  protected $currentPath;
+
+  /**
+   * The redirect destination helper.
+   *
+   * @var \Drupal\Core\Routing\RedirectDestinationInterface
+   */
+  protected $redirectDest;
+
+  /**
+   * The language manager service.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * The current active user.
+   *
+   * @var \Drupal\Core\Session\AccountProxyInterface
+   */
+  protected $currentUser;
 
   /**
    * Constructs a CronController object.
-   *
-   * @param \Drupal\Core\CronInterface $cron
-   *   The cron service.
    */
-  public function __construct(CronInterface $cron) {
-    $this->cron = $cron;
+  public function __construct($configFactory, $currentPath, $redirectDest, $languageManager, $entityTypeManager, $currentUser) {
+    $this->config = $configFactory->get('lexicon.settings');
+    $this->currentPath = $currentPath->getPath();
+    $this->redirectDest = $redirectDest->getAsArray();
+    $this->languageManager = $languageManager;
+    $this->entityTypeManager = $entityTypeManager;
+    $this->currentUser = $currentUser;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static($container->get('cron'));
+    return new static(
+      $container->get('config.factory'),
+      $container->get('path.current'),
+      $container->get('redirect.destination'),
+      $container->get('language_manager'),
+      $container->get('entity_type.manager'),
+      $container->get('current_user')
+    );
   }
 
   /**
    * Callback for lexicon page.
    */
   public function page() {
-    $config = \Drupal::config('lexicon.settings');
+    $config = $this->config;
     $found_vid = NULL;
-    $curr_path = \Drupal::service('path.current')->getPath();
-    $scroll_enabled = $config->get('lexicon_local_links_scroll', 0);
-
-    $path = drupal_get_path('module', 'lexicon');
-
+    // @codingStandardsIgnoreLine
+    // $scroll_enabled = $config->get('lexicon_local_links_scroll', 0);
+    // $path = drupal_get_path('module', 'lexicon');
     $vids = $config->get('lexicon_vids', []);
 
-    // Get the vocabulary-id for the vocabulary which the page callback is called
-    // for by comparing the current path to the path that is configured for each
-    // Lexicon.
+    // Get the vocabulary-id for the vocabulary which the page callback is
+    // called for by comparing the current path to the path that is configured
+    // for each Lexicon.
     foreach ($vids as $vid) {
       $tmp_path = $config->get('lexicon_path_' . $vid);
-      if (strpos($curr_path, $tmp_path) !== FALSE) {
+      if (strpos($this->currentPath, $tmp_path) !== FALSE) {
         $found_vid = $vid;
         break;
       }
@@ -81,18 +124,20 @@ class LexiconPageController extends ControllerBase {
     // By default the active menu would be "navigation", causing only
     // "Home" > $node->title to be shown.
     // menu_set_active_menu_names('primary-links');.
-    return $this->_lexicon_overview($voc, $letter);
+    return $this->lexiconOverview($voc, $letter);
   }
 
   /**
+   * Returns overview.
+   *
    * Lexicon overview function that creates all the data end renders the output
    * through the various theme templates.
    */
-  protected function _lexicon_overview($vocab, $letter = NULL) {
-    $config = \Drupal::config('lexicon.settings');
-    $dest = \Drupal::destination()->getAsArray();
+  protected function lexiconOverview($vocab, $letter = NULL) {
+    $config = $this->config;
     $vid = $vocab->id();
-    $path = $config->get('lexicon_path_' . $vid, '/lexicon/' . $vid);
+    // @codingStandardsIgnoreLine
+    // $path = $config->get('lexicon_path_' . $vid, '/lexicon/' . $vid);
 
     $current_let = '';
 
@@ -107,20 +152,20 @@ class LexiconPageController extends ControllerBase {
       return MENU_NOT_FOUND;
     }
 
-    // @todo: Set the title if the terms are displayed per letter instead of in one big
-    // list if the Lexicon is configured to be split into multiple pages and there
-    // is a letter argument.
+    // @TODO: Set the title if the terms are displayed per letter instead of
+    // in one big list if the Lexicon is configured to be split into multiple
+    // pages and there is a letter argument.
     if ($page_per_letter && $letter) {
-      drupal_set_title(t('@title beginning with @let', [
+      drupal_set_title($this->t('@title beginning with @let', [
         '@title' => $config->get('lexicon_title_' . $vid, $vocab->name),
         '@let' => drupal_strtoupper($letter),
       ]));
     }
 
-    $langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
-    $tree = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree($vid, 0, NULL, TRUE);
+    $langcode = $this->languageManager->getCurrentLanguage()->getId();
+    $tree = $this->entityTypeManager->getStorage('taxonomy_term')->loadTree($vid, 0, NULL, TRUE);
     // Switch to translated term switched to different language.
-    if ($langcode != \Drupal::languageManager()->getDefaultLanguage()->getId()) {
+    if ($langcode != $this->languageManager->getDefaultLanguage()->getId()) {
       foreach ($tree as &$term) {
         if ($term->hasTranslation($langcode)) {
           $term = $term->getTranslation($langcode);
@@ -131,7 +176,8 @@ class LexiconPageController extends ControllerBase {
 
     // Since the tree might not be sorted alphabetically sort it.
     uasort($tree, function ($a, $b) {
-      // Sort callback function to sort vocabulary trees alphabetically on term name.
+      // Sort callback function to sort vocabulary trees alphabetically
+      // on term name.
       if (Unicode::strtolower($a->getName()) == Unicode::strtolower($b->getName())) {
         return 0;
       }
@@ -149,7 +195,7 @@ class LexiconPageController extends ControllerBase {
     // If the overview is separated in sections per letter or the Lexicon is
     // displayed spread over multiple pages per letter create the alphabar.
     if ($separate || $page_per_letter) {
-      $lexicon_alphabar = $this->_lexicon_alphabar($vid, $tree);
+      $lexicon_alphabar = $this->lexiconAlphabar($vid, $tree);
     }
 
     $lexicon_overview_sections = [];
@@ -161,7 +207,7 @@ class LexiconPageController extends ControllerBase {
       $introduction_text = $config->get('lexicon_introduction_' . $vid, NULL);
       // Display the introduction text if it is set in the configuration.
       if ($introduction_text['value'] != '') {
-        $lexicon_introduction = t(check_markup($introduction_text['value'], $introduction_text['format'])->__toString());
+        $lexicon_introduction = check_markup($introduction_text['value'], $introduction_text['format'])->__toString();
       }
     }
     if (!($page_per_letter && !$letter)) {
@@ -170,17 +216,19 @@ class LexiconPageController extends ControllerBase {
       $lexicon_section = new \stdClass();
       if ($tree) {
         $not_first = FALSE;
-        // Build up the list by iterating through all terms within the vocabulary.
+        // Build up the list by iterating through all terms within
+        // the vocabulary.
         foreach ($tree as $term) {
-          // If terms should not be marked if a term has no description continue with the next term.
+          // If terms should not be marked if a term has no description
+          // continue with the next term.
           if (!$config->get('lexicon_allow_no_description', FALSE) && empty($term->getDescription())) {
             continue;
           }
           // If we're looking for a single letter, see if this is it.
           $term->let = Unicode::strtolower(Unicode::substr($term->getName(), 0, 1));
 
-          // If there is no letter argument or the first letter of the term equals
-          // the letter argument process the term.
+          // If there is no letter argument or the first letter of the term
+          // equals the letter argument process the term.
           if ((!$letter) || $term->let == $letter) {
             // See if it's a new section.
             if ($term->let != $current_let) {
@@ -225,14 +273,16 @@ class LexiconPageController extends ControllerBase {
               '#theme' => 'lexicon_overview_item',
               '#term' => $term_output,
             ];
-            // For future use
+            // For future use:
+            // @codingStandardsIgnoreLine
             // $lexicon_overview_items = \Drupal::service('renderer')->render(taxonomy_term_view($term_output, 'lexicon'));.
             $current_let = $term->let;
             $not_first = TRUE;
           }
         }
         // Create a section without anchor and heading if the Lexicon is not
-        // seperated into sections per letter or if there are no items to display.
+        // seperated into sections per letter or if there are no items
+        // to display.
         if (!$separate || $lexicon_overview_items == '') {
           $lexicon_section = NULL;
         }
@@ -254,7 +304,7 @@ class LexiconPageController extends ControllerBase {
     $lexicon_overview->description = Xss::filter($vocab->getDescription());
     $lexicon_overview->introduction = $lexicon_introduction;
     if ($separate && $config->get('lexicon_go_to_top_link', FALSE) == TRUE) {
-      $lexicon_overview->go_to_top_link['name'] = t('Go to top');
+      $lexicon_overview->go_to_top_link['name'] = $this->t('Go to top');
       $lexicon_overview->go_to_top_link['fragment'] = $config->get('lexicon_go_to_top_link_fragment', 'top');
       $lexicon_overview->go_to_top_link['attributes'] = [
         'class' => ['lexicon_go_to_top_link'],
@@ -265,7 +315,7 @@ class LexiconPageController extends ControllerBase {
       'admin_links' => [
         '#theme' => 'links',
         '#prefix' => '<div class="lexicon-admin-links">',
-        '#links' => $this->_lexicon_admin_links($vocab, $dest),
+        '#links' => $this->lexiconAdminLinks($vocab, $this->redirectDest),
         '#suffix' => '</div>',
       ],
       'overview' => [
@@ -291,26 +341,28 @@ class LexiconPageController extends ControllerBase {
   }
 
   /**
-   * Lexicon admin links function. Returns an array of admin links if the user has
-   * the appropriate permissions.
+   * Returns Admin links.
+   *
+   * Lexicon admin links function. Returns an array of admin links if the user
+   * has the appropriate permissions.
    */
-  protected function _lexicon_admin_links($vocabulary, $destination) {
+  protected function lexiconAdminLinks($vocabulary, $destination) {
     $links = [];
-    if (\Drupal::currentUser()->hasPermission('administer taxonomy')) {
+    if ($this->currentUser->hasPermission('administer taxonomy')) {
       $links['lexicon_add_term'] = [
-        'title' => t('Add term'),
+        'title' => $this->t('Add term'),
         'url' => Url::fromUserInput('/admin/structure/taxonomy/manage/' . $vocabulary->id() . '/add'),
       ];
       $links['lexicon_edit'] = [
-        'title' => t('Edit @name', ['@name' => Unicode::strtolower(Html::escape($vocabulary->id()))]),
+        'title' => $this->t('Edit @name', ['@name' => Unicode::strtolower(Html::escape($vocabulary->id()))]),
         'url' => Url::fromUserInput('/admin/structure/taxonomy/manage/' . $vocabulary->id()),
         'query' => $destination,
       ];
     }
 
-    if (\Drupal::currentUser()->hasPermission('administer filters')) {
+    if ($this->currentUser->hasPermission('administer filters')) {
       $links['lexicon_admin'] = [
-        'title' => t('Lexicon settings'),
+        'title' => $this->t('Lexicon settings'),
         'url' => Url::fromUserInput('/admin/config/system/lexicon'),
         'query' => $destination,
       ];
@@ -320,11 +372,13 @@ class LexiconPageController extends ControllerBase {
   }
 
   /**
+   * Return Alphabar.
+   *
    * Function that builds up the alphabar that is displayed at the top of the
    * Lexicon overview page.
    */
-  protected function _lexicon_alphabar($vid, &$tree) {
-    $config = \Drupal::config('lexicon.settings');
+  protected function lexiconAlphabar($vid, &$tree) {
+    $config = $this->config;
     $path = $config->get('lexicon_path_' . $vid, 'lexicon/' . $vid);
     $page_per_letter = $config->get('lexicon_page_per_letter', FALSE);
 
@@ -342,8 +396,9 @@ class LexiconPageController extends ControllerBase {
 
     // For each term in the vocabulary get the first letter and put it in the
     // array with the correct link.
-    foreach ($tree as $key => $term) {
-      // If terms should not be marked if a term has no description continue with the next term.
+    foreach ($tree as $term) {
+      // If terms should not be marked if a term has no description continue
+      // with the next term.
       if (!$config->get('lexicon_allow_no_description', FALSE) && empty($term->description)) {
         continue;
       }
