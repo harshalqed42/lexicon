@@ -490,13 +490,15 @@ function lexicon_form_user_profile_form_alter(&$form, &$form_state, $form_id) {
 
 /**
  * Implements hook_user_presave().
+ *
+ * @todo : Too few arguments to function lexicon_user_presave(),
  */
-function lexicon_user_presave(&$edit, $account, $category) {
-  // Save the indicator setting when the user profile edit form is submitted.
-  if (isset($edit['lexicon_disable_indicator'])) {
-    $edit['data']['lexicon_disable_indicator'] = $edit['lexicon_disable_indicator'];
-  }
-}
+// function lexicon_user_presave(&$edit, $account, $category) {
+//   // Save the indicator setting when the user profile edit form is submitted.
+//   if (isset($edit['lexicon_disable_indicator'])) {
+//     $edit['data']['lexicon_disable_indicator'] = $edit['lexicon_disable_indicator'];
+//   }
+// }
 
 /**
  * Implements hook_filter_info().
