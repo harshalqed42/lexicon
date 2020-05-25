@@ -72,12 +72,18 @@ class LexiconFilter extends FilterBase {
               continue;
             }
 
+            $langprefix = '';
+            $defaultLangcode = \Drupal::languageManager()->getDefaultLanguage()->getId();
+            if ($term->get('langcode')->getString() != $defaultLangcode) {
+              $langprefix = '/' . $term->get('langcode')->getString();
+            }
+
             if ($config->get('lexicon_page_per_letter', FALSE)) {
-              $linkto = $config->get('lexicon_path_' . $term->getVocabularyId(), '/lexicon/' . $term->getVocabularyId()) . '/letter_' . Unicode::strtolower(Unicode::substr($term->getName(), 0, 1));
+              $linkto = $langprefix . $config->get('lexicon_path_' . $term->getVocabularyId(), '/lexicon/' . $term->getVocabularyId()) . '/letter_' . Unicode::strtolower(Unicode::substr($term->getName(), 0, 1));
               // var_dump([$vids, $linkto, $term->id()]); die ("SSSSAAS");
             }
             else {
-              $linkto = $config->get('lexicon_path_' . $term->getVocabularyId(), '/lexicon/' . $term->getVocabularyId());
+              $linkto = $langprefix . $config->get('lexicon_path_' . $term->getVocabularyId(), '/lexicon/' . $term->getVocabularyId());
             }
 
             // Create a valid anchor id.
