@@ -166,12 +166,14 @@ class LexiconPageController extends ControllerBase {
     $tree = $this->entityTypeManager->getStorage('taxonomy_term')->loadTree($vid, 0, NULL, TRUE);
     // Switch to translated term switched to different language.
     if ($langcode != $this->languageManager->getDefaultLanguage()->getId()) {
-      foreach ($tree as &$term) {
-        if ($term->hasTranslation($langcode)) {
-          $term = $term->getTranslation($langcode);
+      foreach ($tree as $k => $term) {
+        if (!$term->hasTranslation($langcode)){
+          unset($tree[$k]);
+        }
+        else{
+          $tree[$k] = $term->getTranslation($langcode);
         }
       }
-      unset($term);
     }
 
     // Since the tree might not be sorted alphabetically sort it.
@@ -336,7 +338,6 @@ class LexiconPageController extends ControllerBase {
         'library' => ['lexicon/lexicon'],
       ],
     ];
-
     return $output;
   }
 
