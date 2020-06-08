@@ -27,6 +27,20 @@ class LexiconPagesRoutes {
           '_permission' => 'access content',
         ]
       );
+        $routes['lexicon.letter_per_page.' . $vid] = new Route(
+            $config->get('lexicon_path_' . $vid) .'/{letter}',
+            [
+                '_controller' => '\Drupal\lexicon\Controller\LexiconPageController::letterPage',
+                '_title_callback' => '\Drupal\lexicon\Controller\LexiconPageController::letterPageTitle',
+                'title_default' => $config->get('lexicon_title_' . $vid),
+            ],
+            [
+                '_permission' => 'access content',
+            ],
+            [
+                'letter' => '\w+',
+            ]
+        );
     }
     return $routes;
   }

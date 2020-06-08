@@ -60,6 +60,7 @@ function lexicon_block_configure($delta) {
   switch ($delta) {
     case 'lexicon_random_term':
       $vids = array();
+      $config =  \Drupal::config('lexicon.settings');
       // Get all vocabulary id's that are used as Lexicons.
       $vid_list = $config->get('lexicon_vids', array());
       foreach ($vid_list as $vid) {
@@ -69,7 +70,7 @@ function lexicon_block_configure($delta) {
         if ($vid != 0) {
           // Put the vocabulary in the options array.
           $voc = \Drupal\taxonomy\Entity\Vocabulary::load($vid);
-          $vids[$vid] = Html::escape($voc->name);
+          $vids[$vid] = Html::escape($voc->getName());
         }
       }
 
@@ -225,6 +226,7 @@ function lexicon_block_view($delta) {
 
   switch ($delta) {
     case 'lexicon_random_term':
+      $config = \Drupal::config('lexicon.settings');
       $interval = $config->get('lexicon_block_lexicon_random_term_interval', 0) * $config->get('lexicon_block_lexicon_random_term_step', 0);
       $last = $config->get('lexicon_block_lexicon_random_term_last_{$lang}', 0);
       // Check if the configured interval time has expired.
@@ -386,6 +388,7 @@ function lexicon_taxonomy_term_update($term) {
  * Implements hook_form_user_profile_form_alter().
  */
 function lexicon_form_user_profile_form_alter(&$form, &$form_state, $form_id) {
+   $config =  \Drupal::config('lexicon.settings');
   // If Lexicon is configured so that users can indicate if they want to have
   // terms marked in the content, then add the checkbox to the form.
   if ($config->get('lexicon_disable_indicator', FALSE)) {
@@ -459,6 +462,7 @@ function lexicon_filter_info() {
  * Filter tips callback function
  */
 function _filter_lexicon_tips($filter, $format, $long = FALSE) {
+  $config = \Drupal::config('lexicon.settings');
   $block_tags = array();
   $blocking_tags_setting = $config->get('lexicon_blocking_tags', 'abbr acronym');
 
@@ -891,6 +895,7 @@ function _lexicon_term_add_info(&$term, $filter = FALSE) {
  * Get all synonyms for all lexicon terms in a specific vocabulary.
  */
 function _lexicon_get_synonyms($vid) {
+  $config = \Drupal::config('lexicon.settings');
   $synonyms = array();
   $tax_tree = taxonomy_get_tree($vid, 0, NULL, TRUE);
 

@@ -11,6 +11,8 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Url;
 use Drupal\Core\Link;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Controller for Lexicon pages.
@@ -87,9 +89,50 @@ class LexiconPageController extends ControllerBase {
   }
 
   /**
+   * Callback for lexicon page Title.
+   */
+   public function letterPageTitle(Request $request,$letter) {
+       $title = '' ;
+       if (isset($request->attributes->all()['title_default'])) {
+         $title = $request->attributes->all()['title_default'];
+       }
+       $config = $this->config;
+       $page_per_letter = $config->get('lexicon_page_per_letter', FALSE);
+
+       if ($alphabet = $this->_fetch_letter_from_text($letter) && $page_per_letter) {
+           $title = $this->t('@title beginning with @let', [
+               '@title' => $title,
+               '@let' => strtoupper($letter),
+           ]);
+       }
+
+
+     return ['#markup' => $title, '#allowed_tags' => Xss::getHtmlTagList()];
+   }
+
+   public function _fetch_letter_from_text($letter) {
+       $letter_arr = explode('letter_', $letter);
+       if (isset($letter_arr) && !$letter_arr[0]) {
+           return $letter_arr[1];
+       }
+       else {
+           return false;
+       }
+   }
+
+  /**
    * Callback for lexicon page.
    */
-  public function page() {
+   public function letterPage($letter) {
+      if ( $alphabet = $this->_fetch_letter_from_text($letter)) {
+         return $this->page($alphabet);
+      }
+      throw new NotFoundHttpException();
+   }
+  /**
+   * Callback for lexicon page.
+   */
+  public function page($alphabet = NULL) {
     $config = $this->config;
     $found_vid = NULL;
     // @codingStandardsIgnoreLine
@@ -107,24 +150,28 @@ class LexiconPageController extends ControllerBase {
         break;
       }
     }
-
-    $letter = NULL;
-    // Check the argument and derive the letter from it if it is correct.
-    if ($letter != NULL) {
-      if (drupal_strlen($letter) != 8 || Unicode::substr($letter, 0, 7) != 'letter_') {
-        return MENU_NOT_FOUND;
-      }
-      else {
-        $letter = Unicode::substr($letter, 7, 1);
-      }
-    }
-
     $voc = Vocabulary::load($found_vid);
-    // Set the active menu to be "primary-links" to make the breadcrumb work.
-    // By default the active menu would be "navigation", causing only
-    // "Home" > $node->title to be shown.
-    // menu_set_active_menu_names('primary-links');.
-    return $this->lexiconOverview($voc, $letter);
+    if (!$alphabet) {
+        $letter = NULL;
+        // Check the argument and derive the letter from it if it is correct.
+        if ($letter != NULL) {
+            if (drupal_strlen($letter) != 8 || Unicode::substr($letter, 0, 7) != 'letter_') {
+                return MENU_NOT_FOUND;
+            } else {
+                $letter = Unicode::substr($letter, 7, 1);
+            }
+        }
+
+        // Set the active menu to be "primary-links" to make the breadcrumb work.
+        // By default the active menu would be "navigation", causing only
+        // "Home" > $node->title to be shown.
+        // menu_set_active_menu_names('primary-links');.
+        return $this->lexiconOverview($voc, $letter);
+    }
+    else {
+        return $this->lexiconOverview($voc, $alphabet);
+
+    }
   }
 
   /**
@@ -156,10 +203,10 @@ class LexiconPageController extends ControllerBase {
     // in one big list if the Lexicon is configured to be split into multiple
     // pages and there is a letter argument.
     if ($page_per_letter && $letter) {
-      drupal_set_title($this->t('@title beginning with @let', [
+   /**   drupal_set_title($this->t('@title beginning with @let', [
         '@title' => $config->get('lexicon_title_' . $vid, $vocab->name),
         '@let' => drupal_strtoupper($letter),
-      ]));
+      ]));**/
     }
 
     $langcode = $this->languageManager->getCurrentLanguage()->getId();
@@ -199,7 +246,6 @@ class LexiconPageController extends ControllerBase {
     if ($separate || $page_per_letter) {
       $lexicon_alphabar = $this->lexiconAlphabar($vid, $tree);
     }
-
     $lexicon_overview_sections = [];
     $lexicon_introduction = NULL;
 
@@ -394,7 +440,6 @@ class LexiconPageController extends ControllerBase {
       // $letters = drupal_map_assoc($lets);
       $letters = array_combine($lets, $lets);
     }
-
     // For each term in the vocabulary get the first letter and put it in the
     // array with the correct link.
     foreach ($tree as $term) {
@@ -412,7 +457,8 @@ class LexiconPageController extends ControllerBase {
           'class' => ['lexicon-item'],
         ];
       }
-      // If the Lexicon is displayed with all letters on one overview then the
+
+        // If the Lexicon is displayed with all letters on one overview then the
       // link must refer to an anchor.
       else {
         $letters[$term->let] = Link::fromTextAndUrl($term->let, Url::fromUserInput($path, ['fragment' => 'letter_' . $term->let]))->toRenderable();;
@@ -421,13 +467,16 @@ class LexiconPageController extends ControllerBase {
         ];
         $letters[$term->let] = render($letters[$term->let]);
       }
+
+
+
     }
+
 
     $lexicon_alphabar = new \stdClass();
     $lexicon_alphabar->separator = ' ' . $config->get('lexicon_alphabar_separator', '|') . ' ';
     $lexicon_alphabar->instructions = Html::escape($config->get('lexicon_alphabar_instruction', _lexicon_alphabar_instruction_default()));
     $lexicon_alphabar->letters = $letters;
-
     return [
       '#theme' => 'lexicon_alphabar',
       '#lexicon_alphabar' => $lexicon_alphabar,

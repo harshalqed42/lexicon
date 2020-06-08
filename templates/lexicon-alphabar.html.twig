@@ -16,7 +16,14 @@
  */
 #}
 <div class="lexicon-links">
-  {{ lexicon_alphabar.letters|join(lexicon_alphabar.separator)|raw  }}
+  {% for key, letter  in lexicon_alphabar.letters %}
+    {% if (loop.last) %}
+      {{ letter }}
+    {% else %}
+      {{ letter }} {{  lexicon_alphabar.separator|raw }}
+    {% endif %}
+
+  {% endfor %}
 </div>
 <div class="lexicon-alphabar-instructions">
   {{ lexicon_alphabar.instructions }}
