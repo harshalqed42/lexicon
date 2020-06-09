@@ -102,7 +102,7 @@ class LexiconPageController extends ControllerBase {
        if ($alphabet = $this->_fetch_letter_from_text($letter) && $page_per_letter) {
            $title = $this->t('@title beginning with @let', [
                '@title' => $title,
-               '@let' => strtoupper($letter),
+               '@let' => strtoupper($this->_fetch_letter_from_text($letter)),
            ]);
        }
 

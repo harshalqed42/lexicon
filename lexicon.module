@@ -358,13 +358,12 @@ function lexicon_theme($existing, $type, $theme, $path) {
     //     'term' => NULL,
     //   ),
     // ),
-    // 'lexicon_mark_term' => array(
-    //   'template' => 'templates/lexicon-mark-term',
-    //   'variables' => array(
-    //     'term' => NULL,
-    //     'text' => NULL,
-    //   ),
-    // ),
+     'lexicon_mark_term' => array(
+       'variables' => array(
+         'term' => NULL,
+         'text' => NULL,
+       ),
+     ),
   );
 }
 
@@ -499,7 +498,6 @@ function _filter_lexicon_tips($filter, $format, $long = FALSE) {
  * tags and matches, then those 'events' are sorted and handled one by one.
  */
 function _lexicon_insertlink(&$text, &$terms_replace) {
-
   $config = \Drupal::config('lexicon.settings');
   $multibyte_enabled = extension_loaded('mbstring');
   if ($multibyte_enabled) {
@@ -676,7 +674,6 @@ function _lexicon_insertlink(&$text, &$terms_replace) {
       }
     }
   }
-
   ksort($events);
 
   $newtext = '';
@@ -711,8 +708,14 @@ function _lexicon_insertlink(&$text, &$terms_replace) {
     }
     if ($event['type'] == 'match') {
       $matchlen = Drupal\Component\Utility\Unicode::strlen($event['match']);
-      if ($replace_mode == 'template') {
-        $newtext .= theme('lexicon_mark_term', array('term' => $terms_replace[$event['which']], 'text' => $event['match']));
+        if ($replace_mode == 'template') {
+          $items_array = array(
+              '#theme' => 'lexicon_mark_term',
+              '#term' => $terms_replace[$event['which']],
+              '#text' => $event['match'],
+          );
+          $newtext .= \Drupal::service('renderer')->render($items_array);
+//        $newtext .= theme('lexicon_mark_term', array('term' => $terms_replace[$event['which']], 'text' => $event['match']));
       }
       else {
         $newtext .= $terms_replace[$event['which']]['ins_before'] . $event['match'] . $terms_replace[$event['which']]['ins_after'];
@@ -738,21 +741,23 @@ function _lexicon_get_terms(&$vids) {
     foreach ($vids as $vid) {
       // Load the entire vocabulary with all entities.
       $tree = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree($vid, 0, NULL, TRUE);
-      // Add translated terms.
-      $languages = \Drupal::languageManager()->getLanguages();
-      $languages = array_keys($languages);
-      $languages = array_diff($languages, [\Drupal::languageManager()->getDefaultLanguage()->getId()]);
-      foreach ($languages as $langcode) {
-        foreach ($tree as $term) {
-          if ($term->hasTranslation($langcode)) {
-            $tree[] = $term->getTranslation($langcode);
-          }
-        }
-      }
+      $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+        // Add translated terms.
+//      $languages = \Drupal::languageManager()->getLanguages();
+//      $languages = array_keys($languages);
+//      $languages = array_diff($languages, [\Drupal::languageManager()->getDefaultLanguage()->getId()]);
+//      foreach ($languages as $langcode) {
+       foreach ($tree as $term) {
+         if ($term->hasTranslation($current_language)) {
+           $tree[] = $term->getTranslation($current_language);
+         }
+       }
       // Add extra information to each term in the tree.
       foreach ($tree as $term) {
-        _lexicon_term_add_info($term, TRUE);
-        $terms[] = $term;
+        if ($term->hasTranslation($current_language)) {
+          _lexicon_term_add_info($term, TRUE);
+          $terms[] = $term;
+        }
       }
     }
     $got = $terms;

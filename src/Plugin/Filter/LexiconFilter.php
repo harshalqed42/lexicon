@@ -54,11 +54,16 @@ class LexiconFilter extends FilterBase {
       $tip_list = [];
 
       if (is_array($terms)) {
-
         foreach ($terms as $term) {
           // If the term is equal to $current_term than skip marking that term.
           if ($current_term == $term->id()) {
-            continue;
+              continue;
+          }
+          $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+          $current_language_term = $term->getTranslation($current_language);
+          // add terms for replacement only if they are of current language.otherwise skip it.
+          if ($current_language_term->getName() != $term->getName()) {
+              continue;
           }
           $term_title = $term->getName();
           $fragment = NULL;
@@ -73,14 +78,15 @@ class LexiconFilter extends FilterBase {
             if ($term->get('langcode')->getString() != $defaultLangcode) {
               $langprefix = '/' . $term->get('langcode')->getString();
             }
+            $lang = ($term->get('langcode')->getString() != 'und' && $langprefix != '') ?  $langprefix : '';
 
             if ($config->get('lexicon_page_per_letter', FALSE)) {
-              $linkto = $langprefix . $config->get('lexicon_path_' . $term->getVocabularyId(), '/lexicon/' . $term->getVocabularyId()) . '/letter_' . Unicode::strtolower(Unicode::substr($term->getName(), 0, 1));
-              // var_dump([$vids, $linkto, $term->id()]); die ("SSSSAAS");.
+              $linkto = $lang . $config->get('lexicon_path_' . $term->getVocabularyId(), '/lexicon/' . $term->getVocabularyId()) . '/letter_' . Unicode::strtolower(Unicode::substr($term->getName(), 0, 1));
             }
             else {
-              $linkto = $langprefix . $config->get('lexicon_path_' . $term->getVocabularyId(), '/lexicon/' . $term->getVocabularyId());
+              $linkto = $lang . $config->get('lexicon_path_' . $term->getVocabularyId(), '/lexicon/' . $term->getVocabularyId());
             }
+
 
             // Create a valid anchor id.
             $fragment = _lexicon_create_valid_id($term->getName());
@@ -88,7 +94,6 @@ class LexiconFilter extends FilterBase {
           else {
             $linkto = '/taxonomy/term/' . $term->id();
           }
-
           $term_class = $config->get('lexicon_term_class', 'lexicon-term');
 
           if ($replace_mode == 'template') {
