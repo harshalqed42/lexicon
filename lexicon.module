@@ -801,11 +801,19 @@ function _lexicon_term_add_info(&$term, $filter = FALSE) {
     // If this function is called from the filter use "strip_tags" to prevent
     // an infinte loop due to recursive calls and remove all HTML to use the
     // description in the title attribute.
-    if ($filter) {
-      $term->safe_description = strip_tags($term->getDescription());
+    $description_arr = $term->description;
+    $desc = $description_arr->getValue();
+    if (isset($desc[0])) {
+      if ($filter) {
+        $description = $desc[0]['value'];
+        $term->safe_description = strip_tags($description);
+      }
+      else {
+       $term->safe_description = check_markup($desc[0]['value'], $desc[0]['format']);
+      }
     }
     else {
-      $term->safe_description = check_markup($term->getDescription(), $term->format);
+        $term->safe_description = '';
     }
 
     // If there is an image for the term add the image information to the $term
