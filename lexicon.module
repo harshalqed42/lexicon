@@ -755,7 +755,8 @@ function _lexicon_get_terms(&$vids) {
       // Add extra information to each term in the tree.
       foreach ($tree as $term) {
         if ($term->hasTranslation($current_language)) {
-          _lexicon_term_add_info($term, TRUE);
+          $translated_term = $term->getTranslation($current_language);
+          _lexicon_term_add_info($translated_term, TRUE);
           $terms[] = $term;
         }
       }
