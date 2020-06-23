@@ -43,6 +43,10 @@ class LexiconFilter extends FilterBase {
         if (!in_array($node_type, $config->get('lexicon_allowed_content_types'))) {
             return new FilterProcessResult($text);
         }
+
+      }
+      else { //if its not a node page
+        return new FilterProcessResult($text);
       }
     }
 
