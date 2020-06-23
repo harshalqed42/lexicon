@@ -37,11 +37,11 @@ class LexiconFilter extends FilterBase {
       }
     }
     if (!empty($config->get('lexicon_allowed_content_types'))) {
-      $parameters = \Drupal::request()->attributes->all();
+        $parameters = \Drupal::request()->attributes->all();
       if (isset($parameters['node'])) {
         $node_type = $parameters['node']->getType();
         if (!in_array($node_type, $config->get('lexicon_allowed_content_types'))) {
-          return new FilterProcessResult($text);
+            return new FilterProcessResult($text);
         }
       }
     }

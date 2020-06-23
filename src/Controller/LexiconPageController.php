@@ -208,6 +208,7 @@ class LexiconPageController extends ControllerBase {
         '@let' => drupal_strtoupper($letter),
       ]));**/
     }
+    $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
 
     $langcode = $this->languageManager->getCurrentLanguage()->getId();
     $tree = $this->entityTypeManager->getStorage('taxonomy_term')->loadTree($vid, 0, NULL, TRUE);
@@ -259,7 +260,6 @@ class LexiconPageController extends ControllerBase {
       }
     }
     if (!($page_per_letter && !$letter)) {
-      // var_dump($page_per_letter); var_dump($letter); die('ddd');.
       $lexicon_overview_items = [];
       $lexicon_section = new \stdClass();
       if ($tree) {
@@ -442,34 +442,35 @@ class LexiconPageController extends ControllerBase {
     }
     // For each term in the vocabulary get the first letter and put it in the
     // array with the correct link.
+      $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
     foreach ($tree as $term) {
-      // If terms should not be marked if a term has no description continue
-      // with the next term.
-      if (!$config->get('lexicon_allow_no_description', FALSE) && empty($term->description)) {
-        continue;
+      if ($term->hasTranslation($current_language)) {
+          $translated_term = $term->getTranslation($current_language);
+          // If terms should not be marked if a term has no description continue
+          // with the next term.
+          if (!$config->get('lexicon_allow_no_description', FALSE) && empty($translated_term->description)) {
+              continue;
+          }
+          $translated_term->let = Unicode::strtolower(Unicode::substr($translated_term->getName(), 0, 1));
+          // If the Lexicon is split up in seperate pages per letter the link must
+          // refer to the appropriate page.
+          if ($page_per_letter) {
+              $letters[$translated_term->let] = Link::fromTextAndUrl($translated_term->let, Url::fromUserInput($path . '/letter_' . $translated_term->let))->toRenderable();
+              $letters[$translated_term->let]['#attributes'] = [
+                  'class' => ['lexicon-item'],
+              ];
+          }
+
+          // If the Lexicon is displayed with all letters on one overview then the
+          // link must refer to an anchor.
+          else {
+              $letters[$translated_term->let] = Link::fromTextAndUrl($translated_term->let, Url::fromUserInput($path, ['fragment' => 'letter_' . $translated_term->let]))->toRenderable();;
+              $letters[$translated_term->let]['#attributes'] = [
+                  'class' => ['lexicon-item'],
+              ];
+              $letters[$translated_term->let] = render($letters[$translated_term->let]);
+          }
       }
-      $term->let = Unicode::strtolower(Unicode::substr($term->getName(), 0, 1));
-      // If the Lexicon is split up in seperate pages per letter the link must
-      // refer to the appropriate page.
-      if ($page_per_letter) {
-        $letters[$term->let] = Link::fromTextAndUrl($term->let, Url::fromUserInput($path . '/letter_' . $term->let))->toRenderable();
-        $letters[$term->let]['#attributes'] = [
-          'class' => ['lexicon-item'],
-        ];
-      }
-
-        // If the Lexicon is displayed with all letters on one overview then the
-      // link must refer to an anchor.
-      else {
-        $letters[$term->let] = Link::fromTextAndUrl($term->let, Url::fromUserInput($path, ['fragment' => 'letter_' . $term->let]))->toRenderable();;
-        $letters[$term->let]['#attributes'] = [
-          'class' => ['lexicon-item'],
-        ];
-        $letters[$term->let] = render($letters[$term->let]);
-      }
-
-
-
     }
 
 
