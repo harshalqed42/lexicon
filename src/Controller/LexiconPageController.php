@@ -209,23 +209,19 @@ class LexiconPageController extends ControllerBase {
       ]));**/
     }
     $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
-
-    $langcode = $this->languageManager->getCurrentLanguage()->getId();
     $tree = $this->entityTypeManager->getStorage('taxonomy_term')->loadTree($vid, 0, NULL, TRUE);
     // Switch to translated term switched to different language.
-    if ($langcode != $this->languageManager->getDefaultLanguage()->getId()) {
+    $translated_tree = [];
+//    if ($langcode != $this->languageManager->getDefaultLanguage()->getId()) {
       foreach ($tree as $k => $term) {
-        if (!$term->hasTranslation($langcode)){
-          unset($tree[$k]);
-        }
-        else{
-          $tree[$k] = $term->getTranslation($langcode);
+        if ($term->hasTranslation($current_language)) {
+          $translated_tree[$k] = $term->getTranslation($current_language);
         }
       }
-    }
+//    }
 
     // Since the tree might not be sorted alphabetically sort it.
-    uasort($tree, function ($a, $b) {
+    uasort($translated_tree, function ($a, $b) {
       // Sort callback function to sort vocabulary trees alphabetically
       // on term name.
       if (Unicode::strtolower($a->getName()) == Unicode::strtolower($b->getName())) {
@@ -245,7 +241,7 @@ class LexiconPageController extends ControllerBase {
     // If the overview is separated in sections per letter or the Lexicon is
     // displayed spread over multiple pages per letter create the alphabar.
     if ($separate || $page_per_letter) {
-      $lexicon_alphabar = $this->lexiconAlphabar($vid, $tree);
+      $lexicon_alphabar = $this->lexiconAlphabar($vid, $translated_tree);
     }
     $lexicon_overview_sections = [];
     $lexicon_introduction = NULL;
@@ -262,11 +258,11 @@ class LexiconPageController extends ControllerBase {
     if (!($page_per_letter && !$letter)) {
       $lexicon_overview_items = [];
       $lexicon_section = new \stdClass();
-      if ($tree) {
+      if ($translated_tree) {
         $not_first = FALSE;
         // Build up the list by iterating through all terms within
         // the vocabulary.
-        foreach ($tree as $term) {
+        foreach ($translated_tree as $term) {
           // If terms should not be marked if a term has no description
           // continue with the next term.
           if (!$config->get('lexicon_allow_no_description', FALSE) && empty($term->getDescription())) {
