@@ -32,10 +32,20 @@ class LexiconFilter extends FilterBase {
     if ($config->get('lexicon_disable_indicator', FALSE)) {
       if (isset($user->data['lexicon_disable_indicator'])) {
         if ($user->data['lexicon_disable_indicator'] == 1) {
-          return $text;
+            return new FilterProcessResult($text);
         }
       }
     }
+    if (!empty($config->get('lexicon_allowed_content_types'))) {
+      $parameters = \Drupal::request()->attributes->all();
+      if (isset($parameters['node'])) {
+        $node_type = $parameters['node']->getType();
+        if (!in_array($node_type, $config->get('lexicon_allowed_content_types'))) {
+          return new FilterProcessResult($text);
+        }
+      }
+    }
+
 
     $current_term = 0;
     // If the current page is a taxonomy term page then set $current_term.

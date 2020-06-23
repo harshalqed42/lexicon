@@ -37,6 +37,7 @@ class LexiconAdminConfigForm extends ConfigFormBase {
       '#title' => t('General settings'),
     ];
 
+
     $options = [];
     $options = taxonomy_vocabulary_get_names();
     // dump($result);
@@ -58,6 +59,19 @@ class LexiconAdminConfigForm extends ConfigFormBase {
       '#description' => t('Select one or more vocabularies which hold terms for your lexicons.'),
       '#multiple' => TRUE,
       '#required' => FALSE,
+    ];
+
+    $bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo('node');
+    $bundle_options = array_map(function ($item) {
+      return $item['label'];
+    }, $bundles);
+    $form['general']['lexicon_allowed_content_types'] = [
+      '#type' => 'checkboxes',
+      '#options' => $bundle_options,
+      '#title' => $this->t('Allow Lexicon Filter on following Content Types'),
+      '#default_value' => $config->get('lexicon_allowed_content_types') ?? [],
+      '#multiple' => TRUE,
+
     ];
 
     $form['general']['lexicon_allow_no_description'] = [
@@ -394,6 +408,7 @@ class LexiconAdminConfigForm extends ConfigFormBase {
       ->set('lexicon_link', $form_state->getValue('lexicon_link'))
       ->set('lexicon_term_class', $form_state->getValue('lexicon_term_class'))
       ->set('lexicon_disable_indicator', $form_state->getValue('lexicon_disable_indicator'))
+      ->set('lexicon_allowed_content_types', array_filter($form_state->getValue('lexicon_allowed_content_types')))
       ->set('lexicon_clear_filter_cache_on_submit', $form_state->getValue('lexicon_clear_filter_cache_on_submit'))
       ->save();
 
